@@ -138,8 +138,9 @@ ex ()
 }
 
 export PATH="$PATH:/home/raphael/scripts"
-export PATH="$PATH:`pwd`/flutter/bin"
+export PATH="$PATH:~/development/flutter/bin"
 alias cat='bat'
-alias ls='ls -l'
-export CHROME_EXECUTABLE='/home/raphael/scripts/google-chrome-unsafe.sh'
+alias ls='ls --color=auto -la'
 export ANDROID_HOME='/home/raphael/development/android/sdk'
+export BROWSER='/bin/google-chrome-stable'
+source /opt/anaconda/bin/activate root

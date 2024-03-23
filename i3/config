@@ -99,10 +99,12 @@ exec --no-startup-id nm-applet
 exec --no-startup-id mate-volume-control-applet
 
 # start .Xmodmap
-exec --no-startup-id xmodmap /home/raphael/scripts/.Xmodmap
+exec --no-startup-id xmodmap ~/scripts/.Xmodmap
 
-# configure displays
-exec .screenlayout/newLayout.sh
+# start picom
+exec --no-startup-id picom --config ~/.i3/picom_config
+
+#exec_always --no-startup-id picom  -b --config ~/.config/picom.conf
 
 # start flux
 #exec xflux -l 49.0047222 -g 8.3858333
@@ -110,6 +112,9 @@ exec redshift -l 49.0047222:8.3858333
 
 # lock Screen after 15 minutes inactivity
 exec xautolock -time 15 -locker lockScreen &
+
+# fix mouse sensitivity
+exec xinput --set-prop 15 329 -0.3
 
 # change focus
 bindsym $modeOne+j focus left
