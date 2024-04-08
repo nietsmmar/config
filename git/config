@@ -1,0 +1,5 @@
+[user]
+	name = Rapha
+	email = raphael.fritz@articlett.de
+[core]
+	autocrlf = input

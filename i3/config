@@ -11,9 +11,8 @@
 set $modeOne Mod4
 set $modeTwo Mod1
 
-set $monitor1 DVI-D-0
-set $monitor2 DVI-D-1
-set $monitor3 HDMI-0
+set $monitor1 DP-0.8
+set $monitor2 DP-0.1.1
 
 workspace 1:main output $monitor1
 workspace 1 output $monitor1
@@ -23,8 +22,8 @@ workspace 3:study output $monitor1
 workspace 3 output $monitor1
 workspace 4:mail output $monitor2
 workspace 4 output $monitor2
-workspace 5:music output $monitor3
-workspace 5 output $monitor3
+workspace 5:music output $monitor2
+workspace 5 output $monitor2
 workspace 7:scripts output $monitor1
 workspace 7 output $monitor1
 workspace 8 output $monitor2
@@ -38,7 +37,6 @@ workspace 10 output $monitor2
 for_window [class="python" instance="pygame"] floating enable
 for_window [class="Nautilus" instance="file_progress"] floating enable
 for_window [window_role="pop-up"] floating enable
-for_window [class="Gnome-calculator"] floating enable border pixel 1
 for_window [class="Xfce4-notifyd"] floating enable; border none
 for_window [title="Android Emulator$"] floating enable; border none
 
@@ -47,7 +45,6 @@ for_window [title="Android Emulator$"] floating enable; border none
 # start Apps on specific Workspace
 assign [id=25165825] → 5:music
 assign [class="TelegramDesktop" instance="telegram"] → 2:telegram
-assign [class="ts3client_linux_amd64" instance="teamspeak3"] → 2:telegram
 assign [class="Slack" instance="slack"] → 2:telegram
 
 assign [class="Lxappearance" instance="lxappearance"] ~
@@ -81,7 +78,7 @@ font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 floating_modifier $modeTwo
 
 # start a terminal
-bindsym $modeOne+space exec gnome-terminal
+bindsym $modeOne+space exec kitty
 
 # kill focused window
 bindsym $modeTwo+Shift+Q kill
@@ -92,16 +89,13 @@ bindsym $modeOne+d exec dmenu_run
 # start NetworkManager
 exec --no-startup-id nm-applet
 
-# start update-notifier
-#exec --no-startup-id update-notifier
-
-# start sound-applet
-exec --no-startup-id mate-volume-control-applet
-
 # start .Xmodmap
-exec --no-startup-id xmodmap ~/scripts/.Xmodmap
+exec --no-startup-id xmodmap ~/dev/config/xmodmap
 
-# start picom
+# start xrandr screen config
+exec --no-startup-id ~/dev/config/screenlayout/config.sh
+
+# start picom for laptop
 exec --no-startup-id picom --config ~/.i3/picom_config
 
 #exec_always --no-startup-id picom  -b --config ~/.config/picom.conf
@@ -288,7 +282,8 @@ mode "startPrograms" {
     bindsym n exec nautilus; mode "default"
     bindsym f exec google-chrome-stable --incognito; mode "default"
     bindsym r exec gksudo system-config-printer; mode "default"
-    bindsym u exec resetKeyboard; mode "default"
+    bindsym u exec xmodmap ~/dev/config/xmodmap/xmodmap; mode "default"
+    bindsym q exec ~/dev/config/screenlayout/config.sh; mode "default"
     bindsym x exec slack; mode "default"
     bindsym w exec weather; mode "default"
     bindsym p exec flameshot gui; mode "default"

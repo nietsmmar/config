@@ -1,3 +1,0 @@
-backend = "glx";
-use-damage = true;
-vsync = true;

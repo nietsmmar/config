@@ -1,0 +1,13 @@
+#!/bin/bash
+
+input=$1
+output=$2
+size=$3
+
+target_size=$(( $size * 1000 * 1000 * 8 )) # MB in bits
+length=`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 $input`
+length_round_up=$(( ${length%.*} + 1 ))
+total_bitrate=$(( $target_size / $length_round_up ))
+audio_bitrate=$(( 128 * 1000 )) # 128k bit rate
+video_bitrate=$(( $total_bitrate - $audio_bitrate ))
+ffmpeg -i $input -b:v $video_bitrate -maxrate:v $video_bitrate -bufsize:v $(( $target_size / 20 )) -b:a $audio_bitrate $output

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+input=$1
+output=$2
+start=$3 #00:00:00
+length=$4 # in seconds
+
+ffmpeg -ss $start -i $input -t $length -c copy $output
