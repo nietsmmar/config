@@ -1,11 +1,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
-  boot.loader.grub.useOSProber = true;
-
   networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/Berlin";
@@ -166,7 +161,6 @@
         simple-scan
         brscan5
         veracrypt
-        tuxguitar
         baobab
         calibre
         openssl
@@ -199,6 +193,8 @@
     CONFIG = "$HOME/dev/config";
     SCRIPTS = "$HOME/dev/scripts";
   };
+
+  services.openssh.enable = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
