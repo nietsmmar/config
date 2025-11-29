@@ -107,7 +107,10 @@
 
   virtualisation.docker.enable = true;
 
+  programs.nm-applet.enable = true;
+
   environment.systemPackages = with pkgs; [
+      kdePackages.okular
       android-studio
       supabase-cli
       keepassxc
@@ -172,6 +175,8 @@
       gnutar
       libreoffice
       filezilla
+      gemini-cli
+      xautolock
   ];
 
   # qt

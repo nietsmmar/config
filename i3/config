@@ -270,7 +270,7 @@ exec python ~/scripts/mouseFix.py
 exec hsetroot -solid #000000
 
 mode "startPrograms" {
-    bindsym t exec telegram-desktop; mode "default"
+    bindsym t exec Telegram; mode "default"
     bindsym e exec thunderbird; mode "default"
     bindsym g exec firefox -private-window; mode "default"
     bindsym y exec spotify; mode "default"

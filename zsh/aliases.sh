@@ -59,3 +59,8 @@ alias copy="xclip -selection clipboard"
 alias paste="xsel --clipboard"
 
 alias nrb="sudo nixos-rebuild switch --flake ~/dev/config/nixos#laptop"
+function ns() { 
+    nix shell nixpkgs#$1
+}
+
+# alias google-chrome-stable='google-chrome-stable --use-vulkan --enable-features=Vulkan,VaapiVideoEncoder'

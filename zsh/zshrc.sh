@@ -1,3 +1,5 @@
+zmodload zsh/zprof
+
 export fpath=($CONFIG/zsh/completions/ $fpath)
 source "$CONFIG/zsh/completionSettings.sh"
 source "$CONFIG/zsh/readline.sh"
@@ -12,3 +14,5 @@ source "$CONFIG/zsh/dirStack.sh"
 ulimit -c unlimited
 
 source "$CONFIG/fzf/fzf.zsh"
+
+TERM=xterm-kitty
