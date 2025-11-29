@@ -47,6 +47,7 @@ alias canibuy="bash ~/resource/finances/showBudget"
 
 alias transfer="rsync --archive --stats --progress --human-readable"
 alias k="$CONFIG/scripts/killProcess.sh"
+alias kk="$CONFIG/scripts/killKillProcess.sh"
 alias cat="bat"
 
 alias cp='cp -v'

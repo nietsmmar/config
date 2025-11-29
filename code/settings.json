@@ -1,0 +1,6 @@
+{
+    "workbench.colorTheme": "Default Dark Modern",
+    "nix.enableLanguageServer": true,
+    "git.openRepositoryInParentFolders": "never",
+    "window.zoomLevel": 2
+}
