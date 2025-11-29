@@ -48,7 +48,7 @@
     isNormalUser = true;
     description = "xunil";
     shell = pkgs.zsh;
-    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" ];
+    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "docker" ];
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -105,7 +105,12 @@
   # make iphone mount
   services.usbmuxd.enable = true;
 
+  virtualisation.docker.enable = true;
+
   environment.systemPackages = with pkgs; [
+      android-studio
+      supabase-cli
+      keepassxc
       wget
       lxappearance
       xorg.xmodmap
@@ -166,6 +171,7 @@
       openssl
       gnutar
       libreoffice
+      filezilla
   ];
 
   # qt
@@ -189,9 +195,9 @@
     
     ANDROID_HOME = "$HOME/dev/android/sdk";
     BROWSER = "/bin/google-chrome-stable";
-    CHROME_EXECUTABLE = "$HOME/dev/scripts/google-chrome-unsafe.sh";
+    CHROME_EXECUTABLE = "$HOME/dev/config/scripts/google-chrome-unsafe.sh";
     CONFIG = "$HOME/dev/config";
-    SCRIPTS = "$HOME/dev/scripts";
+    SCRIPTS = "$HOME/dev/config/scripts";
   };
 
   services.openssh.enable = true;

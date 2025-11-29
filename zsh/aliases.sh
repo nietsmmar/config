@@ -57,3 +57,5 @@ alias wget="wget --hsts-file=\"$XDG_DATA_HOME/wget-hsts\""
 
 alias copy="xclip -selection clipboard"
 alias paste="xsel --clipboard"
+
+alias nrb="sudo nixos-rebuild switch --flake ~/dev/config/nixos#laptop"
