@@ -1,5 +1,5 @@
 # Fzf settings
-source "$HOME/.local/share/fzf/shell/key-bindings.zsh"
+source "$CONFIG/fzf/key-bindings.zsh"
 # Use fd for fzf
 export FZF_DEFAULT_COMMAND="fd --follow"
 export FZF_CTRL_T_COMMAND="fd --follow -I"

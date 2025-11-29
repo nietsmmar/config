@@ -1,11 +1,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
-  boot.loader.grub.useOSProber = true;
-
   networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/Berlin";
@@ -53,7 +48,7 @@
     isNormalUser = true;
     description = "xunil";
     shell = pkgs.zsh;
-    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" ];
+    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "docker" ];
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -110,7 +105,12 @@
   # make iphone mount
   services.usbmuxd.enable = true;
 
+  virtualisation.docker.enable = true;
+
   environment.systemPackages = with pkgs; [
+      android-studio
+      supabase-cli
+      keepassxc
       wget
       lxappearance
       xorg.xmodmap
@@ -127,51 +127,51 @@
       libnotify
       ocrmypdf
       pdfgrep
-              firefox
-        git
-        thunderbird
-        kitty
-        zsh
-        telegram-desktop
-        gcc
-        vscode
-        spotify
-        arandr
-        fzf
-        unzip
-        fd
-        eza
-        bat
-        google-chrome
-        keepassxc
-        nextcloud-client
-        slack
-        flameshot
-        pavucontrol
-        vlc
-        signal-desktop
-        playerctl
-        inkscape
-        nomacs
-        # okular
-        jetbrains.pycharm-community
-        nautilus
-        sushi
-        anki
-        sigil
-        obs-studio
-        tor-browser
-        kdePackages.kdenlive
-        xdotool
-        simple-scan
-        brscan5
-        veracrypt
-        tuxguitar
-        baobab
-        calibre
-        openssl
-        gnutar
-        libreoffice
+      firefox
+      git
+      thunderbird
+      kitty
+      zsh
+      telegram-desktop
+      gcc
+      vscode
+      spotify
+      arandr
+      fzf
+      unzip
+      fd
+      eza
+      bat
+      google-chrome
+      keepassxc
+      nextcloud-client
+      slack
+      flameshot
+      pavucontrol
+      vlc
+      signal-desktop
+      playerctl
+      inkscape
+      nomacs
+      # okular
+      jetbrains.pycharm-community
+      nautilus
+      sushi
+      anki
+      sigil
+      obs-studio
+      tor-browser
+      kdePackages.kdenlive
+      xdotool
+      simple-scan
+      brscan5
+      veracrypt
+      baobab
+      calibre
+      openssl
+      gnutar
+      libreoffice
+      filezilla
   ];
 
   # qt
@@ -195,10 +195,12 @@
     
     ANDROID_HOME = "$HOME/dev/android/sdk";
     BROWSER = "/bin/google-chrome-stable";
-    CHROME_EXECUTABLE = "$HOME/dev/scripts/google-chrome-unsafe.sh";
+    CHROME_EXECUTABLE = "$HOME/dev/config/scripts/google-chrome-unsafe.sh";
     CONFIG = "$HOME/dev/config";
-    SCRIPTS = "$HOME/dev/scripts";
+    SCRIPTS = "$HOME/dev/config/scripts";
   };
+
+  services.openssh.enable = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
