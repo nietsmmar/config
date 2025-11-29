@@ -2220,6 +2220,10 @@ menubar > item popover.menu.background popover.menu.background > contents {
 /**********************
  * Popover Base Menus *
  **********************/
+popover.menu {
+  border: 0 !important;
+}
+
 popover.menu box.inline-buttons {
   padding: 0 14px;
 }
@@ -5935,6 +5939,10 @@ flowboxchild.card:not(.category-tile) {
   padding: 9px 15px;
   box-shadow: none;
   background-color: alpha(currentColor, 0.05);
+}
+
+app-context-bar {
+  border: 0;
 }
 
 app-context-bar > box:not(:first-child) > button.flat {
