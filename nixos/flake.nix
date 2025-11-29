@@ -12,7 +12,8 @@
       specialArgs = { inherit inputs; };
       modules = [
         ./configuration.nix
-        ./hardware_pc.nix
+        ./custom/pc.nix
+        ./hardware/pc.nix
         { networking.hostName = "pc"; }
       ];
     };
@@ -21,7 +22,8 @@
       specialArgs = { inherit inputs; };
       modules = [
         ./configuration.nix
-        ./hardware_pc.nix
+        ./custom/laptop.nix
+        ./hardware/laptop.nix
        { networking.hostName = "laptop"; }
       ];
     };
