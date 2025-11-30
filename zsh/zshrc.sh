@@ -16,3 +16,4 @@ ulimit -c unlimited
 source "$CONFIG/fzf/fzf.zsh"
 
 TERM=xterm-kitty
+export PATH="$PATH:$HOME/dev/flutter/bin"

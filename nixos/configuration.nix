@@ -125,7 +125,6 @@
   environment.systemPackages = with pkgs; [
       libmbim # mobile sim
       kdePackages.okular
-      android-studio
       supabase-cli
       keepassxc
       wget
@@ -170,12 +169,11 @@
       playerctl
       inkscape
       nomacs
-      # okular
       jetbrains.pycharm-community
       nautilus
-      sushi
+      sushi # previewer for nautilus
       anki
-      sigil
+      android-studio-flutter
       obs-studio
       tor-browser
       kdePackages.kdenlive
@@ -183,8 +181,6 @@
       simple-scan
       brscan5
       veracrypt
-      baobab
-      calibre
       openssl
       gnutar
       libreoffice
@@ -208,7 +204,7 @@
     XDG_DATA_HOME   = "$HOME/.local/share";
     XDG_STATE_HOME  = "$HOME/.local/state";
 
-    NIX_BUILD_SHELL = "zsh"; # not working now with zsh
+    #NIX_BUILD_SHELL = "zsh";
 
     # Not officially in the specification
     XDG_BIN_HOME    = "$HOME/.local/bin";
@@ -218,7 +214,7 @@
     CHROME_EXECUTABLE = "$HOME/dev/config/scripts/google-chrome-unsafe.sh";
     CONFIG = "$HOME/dev/config";
     SCRIPTS = "$HOME/dev/config/scripts";
-    PATH = "$PATH:$SCRIPTS"; # not working yet
+    PATH = "$HOME/dev/config/scripts"; # not working yet
   };
 
   services.openssh.enable = true;

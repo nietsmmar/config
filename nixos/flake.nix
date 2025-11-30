@@ -9,6 +9,7 @@
     let
       overlay = final: prev: {
         betterbird = prev.callPackage ./packages/betterbird/package.nix { };
+        android-studio-flutter = prev.callPackage ./packages/android-studio-wrapper.nix { };
       };
     in
     rec {
