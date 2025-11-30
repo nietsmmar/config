@@ -11,8 +11,8 @@
 set $modeOne Mod4
 set $modeTwo Mod1
 
-set $monitor1 DP-0.8
-set $monitor2 DP-0.1.1
+set $monitor1 DP-2-8
+set $monitor2 DP-2-1-1
 
 workspace 1:main output $monitor1
 workspace 1 output $monitor1
@@ -44,7 +44,7 @@ for_window [title="Android Emulator$"] floating enable; border none
 
 # start Apps on specific Workspace
 assign [id=25165825] → 5:music
-assign [class="TelegramDesktop" instance="telegram"] → 2:telegram
+assign [class="TelegramDesktop" instance="Telegram"] → 2:telegram
 assign [class="Slack" instance="slack"] → 2:telegram
 
 assign [class="Lxappearance" instance="lxappearance"] ~
@@ -283,7 +283,8 @@ mode "startPrograms" {
     bindsym f exec google-chrome-stable --incognito; mode "default"
     bindsym r exec gksudo system-config-printer; mode "default"
     bindsym u exec xmodmap ~/dev/config/xmodmap/xmodmap; mode "default"
-    bindsym q exec ~/dev/config/screenlayout/config.sh; mode "default"
+    bindsym q exec ~/dev/config/screenlayout/daisy.sh; mode "default"
+    bindsym a exec ~/dev/config/screenlayout/config.sh; mode "default"
     bindsym x exec slack; mode "default"
     bindsym w exec weather; mode "default"
     bindsym p exec flameshot gui; mode "default"

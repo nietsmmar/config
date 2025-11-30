@@ -2,6 +2,19 @@
 
 {
   networking.networkmanager.enable = true;
+  networking.modemmanager.enable = true;
+  networking.modemmanager.fccUnlockScripts = [
+    {
+      id = "2c7c:030a";
+      path = "${pkgs.modemmanager}/share/ModemManager/fcc-unlock.available.d/2c7c:030a";
+    }
+  ];
+
+  systemd.services.ModemManager = {
+    enable = lib.mkForce true;
+    path = [ pkgs.libmbim ]; # required by fcc-unlock-script
+    wantedBy = [ "multi-user.target" "network.target" ];
+  };
 
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -110,6 +123,7 @@
   programs.nm-applet.enable = true;
 
   environment.systemPackages = with pkgs; [
+      libmbim # mobile sim
       kdePackages.okular
       android-studio
       supabase-cli
