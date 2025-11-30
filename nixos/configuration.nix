@@ -146,7 +146,7 @@
       pdfgrep
       firefox
       git
-      thunderbird
+      betterbird
       kitty
       zsh
       telegram-desktop
@@ -191,6 +191,7 @@
       filezilla
       gemini-cli
       xautolock
+      redshift
   ];
 
   # qt
@@ -217,6 +218,7 @@
     CHROME_EXECUTABLE = "$HOME/dev/config/scripts/google-chrome-unsafe.sh";
     CONFIG = "$HOME/dev/config";
     SCRIPTS = "$HOME/dev/config/scripts";
+    PATH = "$PATH:$SCRIPTS"; # not working yet
   };
 
   services.openssh.enable = true;
