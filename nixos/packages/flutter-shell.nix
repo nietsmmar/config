@@ -24,6 +24,7 @@ pkgs.mkShell {
     sysprof
     libepoxy
     android-studio
+    pre-commit
   ];
 
   shellHook = ''

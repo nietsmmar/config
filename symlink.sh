@@ -24,7 +24,8 @@ make_symlink kitty/kitty.conf .config/kitty/kitty.conf
 make_symlink i3/picom_config .i3/picom_config
 make_symlink git/config .config/git/config
 make_symlink code/settings.json .config/Code/User/settings.json
-make_symlink zsh/zshrc.sh .zshrc
+make_symlink zsh/zshrc.sh .config/zsh/.zshrc # ZDOTDIR
+make_symlink zsh/zshenv .zshenv
 make_symlink theme/gtk-4.0/assets .config/gtk-4.0/assets
 make_symlink theme/gtk-4.0/gtk.css .config/gtk-4.0/gtk.css
 make_symlink theme/gtk-4.0/gtk-dark.css .config/gtk-4.0/gtk-dark.css

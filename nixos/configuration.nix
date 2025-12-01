@@ -1,7 +1,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  networking.networkmanager.enable = true;
   networking.modemmanager.enable = true;
   networking.modemmanager.fccUnlockScripts = [
     {
@@ -64,7 +63,25 @@
     extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "docker" ];
   };
 
+  
+  # Enable sound with pipewire.
+  services.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    # If you want to use JACK applications, uncomment the following
+    jack.enable = true;
+
+    # use the example session manager (no others are packaged yet so this is enabled by default,
+    # no need to redefine it in your config for now)
+    #media-session.enable = true;
+  };
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
 
   # printing
   services.printing.enable = true;
@@ -133,6 +150,8 @@
       libsForQt5.qt5ct
       adwaita-qt
       adwaita-qt6
+      alsa-utils
+      alsa-tools
       xorg.xprop
       zip
       dconf
@@ -188,6 +207,7 @@
       gemini-cli
       xautolock
       redshift
+      nodejs_24 # for npx supabase mcp
   ];
 
   # qt
@@ -214,7 +234,7 @@
     CHROME_EXECUTABLE = "$HOME/dev/config/scripts/google-chrome-unsafe.sh";
     CONFIG = "$HOME/dev/config";
     SCRIPTS = "$HOME/dev/config/scripts";
-    PATH = "$HOME/dev/config/scripts"; # not working yet
+    PATH = "$HOME/dev/config/scripts";
   };
 
   services.openssh.enable = true;
