@@ -111,6 +111,7 @@
 
   services.gvfs.enable = true; # mount, trash...
   services.tumbler.enable = true; # thumbnails support
+  programs.dconf.enable = true;
 
   # fix gstreamer audio/video properties in nautilus
   environment.sessionVariables.GST_PLUGIN_SYSTEM_PATH_1_0 = lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" (with pkgs.gst_all_1; [
@@ -137,6 +138,7 @@
       lxappearance
       xorg.xmodmap
       libsForQt5.qt5ct
+      adwaita-icon-theme
       adwaita-qt
       adwaita-qt6
       alsa-utils
@@ -180,6 +182,8 @@
       jetbrains.pycharm-community
       nautilus
       sushi # previewer for nautilus
+      tinysparql # file indexer and search tool
+      localsearch # metadata extractors for tracker
       anki
       android-studio-flutter
       obs-studio
