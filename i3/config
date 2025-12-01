@@ -106,6 +106,7 @@ exec redshift -l 49.0047222:8.3858333
 
 # lock Screen after 15 minutes inactivity
 exec xautolock -time 15 -locker lockScreen &
+exec --no-startup-id $HOME/dev/config/scripts/prevent_display_sleep_on_audio.sh &
 
 # fix mouse sensitivity
 exec xinput --set-prop 15 329 -0.3
