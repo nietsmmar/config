@@ -1,6 +1,8 @@
 { config, pkgs, lib, ... }:
 
 {
+  programs.nm-applet.enable = true;
+  networking.networkmanager.enable = true;
   networking.modemmanager.enable = true;
   networking.modemmanager.fccUnlockScripts = [
     {
@@ -100,17 +102,6 @@
   # enable nix-ld to fix linker
   programs.nix-ld.enable = true;
 
-  # graphics
-  # Enable OpenGL
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-    extraPackages = with pkgs; [
-      # rocm-opencl-icd
-      # rocm-opencl-runtime
-    ];
-  };
-
   # qt dark-mode
   #qt = {
   #  enable = true;
@@ -136,8 +127,6 @@
   services.usbmuxd.enable = true;
 
   virtualisation.docker.enable = true;
-
-  programs.nm-applet.enable = true;
 
   environment.systemPackages = with pkgs; [
       libmbim # mobile sim
