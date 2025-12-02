@@ -201,6 +201,8 @@
       xautolock
       redshift
       nodejs_24 # for npx supabase mcp
+      obsidian
+      kdePackages.kolourpaint
   ];
 
   # qt
