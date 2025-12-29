@@ -184,6 +184,8 @@
       sushi # previewer for nautilus
       tinysparql # file indexer and search tool
       localsearch # metadata extractors for tracker
+      ffmpegthumbnailer # video thumbnails nautilus
+      gst_all_1.gst-libav # video thumbnails nautilus
       anki
       android-studio-flutter
       obs-studio
