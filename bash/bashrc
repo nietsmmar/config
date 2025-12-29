@@ -143,3 +143,4 @@ alias cat='bat'
 alias ls='ls --color=auto -la'
 export ANDROID_HOME='/home/raphael/development/android/sdk'
 export BROWSER='/bin/google-chrome-stable'
+. "/home/xunil/.deno/env"
