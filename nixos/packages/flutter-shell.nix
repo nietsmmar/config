@@ -25,6 +25,7 @@ pkgs.mkShell {
     libepoxy
     android-studio
     pre-commit
+    poppler-utils #for pdf manipulation when uploading lessons
   ];
 
   shellHook = ''
