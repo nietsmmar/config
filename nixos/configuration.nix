@@ -205,6 +205,8 @@
       nodejs_24 # for npx supabase mcp
       obsidian
       kdePackages.kolourpaint
+      postman
+      claude-code
   ];
 
   # qt

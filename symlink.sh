@@ -34,3 +34,4 @@ make_symlink theme/gtk-3.0/gtk.css .config/gtk-3.0/gtk.css
 make_symlink theme/gtk-3.0/gtk-dark.css .config/gtk-3.0/gtk-dark.css
 make_symlink gemini/settings.json .gemini/settings.json
 make_symlink desktop/background-image .background-image
+make_symlink claude/.claude.json .claude.json
