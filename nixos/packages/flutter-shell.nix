@@ -23,12 +23,19 @@ pkgs.mkShell {
     xorg.libXtst
     sysprof
     libepoxy
+    fontconfig
     android-studio
     pre-commit
     poppler-utils #for pdf manipulation when uploading lessons
+
+    # Required by audioplayers_linux
+    gst_all_1.gstreamer
+    gst_all_1.gst-plugins-base
+    gst_all_1.gst-plugins-good
   ];
 
   shellHook = ''
-    export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [ pkgs.libepoxy ]}:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [ pkgs.libepoxy pkgs.fontconfig ]}:$LD_LIBRARY_PATH
+    export PKG_CONFIG_PATH=${pkgs.gst_all_1.gstreamer.dev}/lib/pkgconfig:${pkgs.gst_all_1.gst-plugins-base.dev}/lib/pkgconfig:${pkgs.sysprof.dev}/lib/pkgconfig:$PKG_CONFIG_PATH
   '';
 }
