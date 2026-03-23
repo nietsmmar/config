@@ -84,6 +84,38 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # auto garbage collect nix
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    persistent = true;
+    options = "--delete-older-than 30d";
+  };
+  nix.settings.auto-optimise-store = true;
+
+  # Create a systemd user service for battery monitoring
+  systemd.user.services.battery-monitor = {
+    description = "Battery level monitor";
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = pkgs.writeShellScript "battery-monitor" ''
+        while true; do
+          battery_level=$(${pkgs.coreutils}/bin/cat /sys/class/power_supply/BAT0/capacity)
+          battery_status=$(${pkgs.coreutils}/bin/cat /sys/class/power_supply/BAT0/status)
+          
+          if [ "$battery_level" -le 10 ] && [ "$battery_status" = "Discharging" ]; then
+            ${pkgs.libnotify}/bin/notify-send -u critical "Battery Low" "Battery level is at ''${battery_level}%"
+          fi
+          
+          sleep 60  # Check every minute
+        done
+      '';
+      Restart = "always";
+    };
+    wantedBy = [ "default.target" ];
+  };
+
+
 
   # printing
   services.printing.enable = true;
@@ -179,7 +211,7 @@
       playerctl
       inkscape
       nomacs
-      jetbrains.pycharm-community
+      jetbrains.pycharm-oss
       nautilus
       sushi # previewer for nautilus
       tinysparql # file indexer and search tool
@@ -207,6 +239,7 @@
       kdePackages.kolourpaint
       postman
       claude-code
+      stripe-cli
   ];
 
   # qt
