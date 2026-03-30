@@ -1,13 +1,7 @@
 # ~/dev/config/nixos/packages/flutter-shell.nix
 # This file defines the development shell for the flutter project.
-{ system ? builtins.currentSystem }:
+{ pkgs }:
 
-let
-  pkgs = import <nixpkgs> {
-    inherit system;
-    config.allowUnfree = true; # Allow unfree packages within this shell
-  };
-in
 pkgs.mkShell {
   # These are the packages that will be available in the shell
   buildInputs = with pkgs; [

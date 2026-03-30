@@ -37,5 +37,17 @@
           ];
         };
       };
+
+      # Development shells
+      devShells.x86_64-linux =
+        let
+          pkgs = import nixpkgs {
+            system = "x86_64-linux";
+            config.allowUnfree = true;
+          };
+        in
+        {
+          flutter = import ./packages/flutter-shell.nix { inherit pkgs; };
+        };
     };
 }

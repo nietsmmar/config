@@ -121,6 +121,12 @@
   services.printing.enable = true;
   services.ipp-usb.enable=true; #usb
 
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
   # scanner
   hardware = {
     sane = {
