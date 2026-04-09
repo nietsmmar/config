@@ -51,4 +51,15 @@
     VK_ICD_FILENAMES = "/run/opengl-driver/share/vulkan/icd.d/intel_icd.x86_64.json";
   };
 
+  # Reset GSM modem after resume from suspend
+  systemd.services.modem-resume-reset = {
+    description = "Reset GSM modem after resume from suspend";
+    after = [ "suspend.target" "hibernate.target" "hybrid-sleep.target" ];
+    wantedBy = [ "suspend.target" "hibernate.target" "hybrid-sleep.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.modemmanager}/bin/mmcli -m 0 --reset";
+    };
+  };
+
 }
