@@ -111,6 +111,9 @@ exec --no-startup-id $HOME/dev/config/scripts/prevent_display_sleep_on_audio.sh 
 # fix mouse sensitivity
 exec xinput --set-prop 15 329 -0.3
 
+# toggle touchpad
+bindsym $modeOne+t exec ~/dev/config/scripts/toggle-touchpad
+
 # change focus
 bindsym $modeOne+j focus left
 bindsym $modeOne+k focus down

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+DEVICE="ELAN067D:00 04F3:3209 Touchpad"
+
+# Get current state (1 = enabled, 0 = disabled)
+STATE=$(xinput list-props "$DEVICE" | grep "Device Enabled" | awk '{print $NF}')
+
+if [ "$STATE" = "1" ]; then
+    xinput disable "$DEVICE"
+    notify-send "Touchpad" "Disabled" -t 1500
+else
+    xinput enable "$DEVICE"
+    notify-send "Touchpad" "Enabled" -t 1500
+fi
