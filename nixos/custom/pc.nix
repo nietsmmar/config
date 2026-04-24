@@ -6,6 +6,11 @@
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
+  #boot.blacklistedKernelModules = [ "nouveau" ];
+  #boot.extraModulePackages = [ config.hardware.nvidia.package ];
+
+  #boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+
   # noisetorch (nosie cancelling for mic)
   programs.noisetorch.enable = true;
 
@@ -16,9 +21,9 @@
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
 
-  # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = ["nvidia"];
+  #boot.kernelParams = [ "nvidia-drm.modeset=1" ];
   
+  services.xserver.videoDrivers = ["nvidia"];
   hardware.nvidia = {
     # Modesetting is required.
     modesetting.enable = true;
@@ -48,5 +53,12 @@
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
     package = config.boot.kernelPackages.nvidiaPackages.stable;
+  };
+
+  # graphics
+  # Enable OpenGL
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
   };
 }
