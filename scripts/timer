@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Usage: timer <duration> [label]
+# Duration formats: 5m, 90s, 1:30 (mm:ss), 25 (plain = minutes)
+# Examples:
+#   timer 5m
+#   timer 1:30
+#   timer 25
+#   timer 90s
+#   timer stop
+
+TIMER_FILE=/tmp/i3timer
+
+if [[ "$1" == "stop" ]]; then
+    rm -f "$TIMER_FILE"
+    echo "Timer stopped."
+    exit 0
+fi
+
+if [[ -z "$1" ]]; then
+    echo "Usage: timer <duration> [label]"
+    echo "  Examples: timer 5m | timer 90s | timer 1:30 | timer 25 | timer stop"
+    exit 1
+fi
+
+INPUT="$1"
+LABEL="${2:-}"
+TOTAL_SECS=0
+
+if [[ "$INPUT" =~ ^([0-9]+):([0-9]+)$ ]]; then
+    TOTAL_SECS=$(( ${BASH_REMATCH[1]} * 60 + ${BASH_REMATCH[2]} ))
+elif [[ "$INPUT" =~ ^([0-9]+)h$ ]]; then
+    TOTAL_SECS=$(( ${BASH_REMATCH[1]} * 3600 ))
+elif [[ "$INPUT" =~ ^([0-9]+)m$ ]]; then
+    TOTAL_SECS=$(( ${BASH_REMATCH[1]} * 60 ))
+elif [[ "$INPUT" =~ ^([0-9]+)s$ ]]; then
+    TOTAL_SECS=${BASH_REMATCH[1]}
+elif [[ "$INPUT" =~ ^([0-9]+)$ ]]; then
+    TOTAL_SECS=$(( ${BASH_REMATCH[1]} * 60 ))
+else
+    echo "Invalid duration: $INPUT"
+    exit 1
+fi
+
+if [[ $TOTAL_SECS -le 0 ]]; then
+    echo "Duration must be greater than zero."
+    exit 1
+fi
+
+END_TIME=$(( $(date +%s) + TOTAL_SECS ))
+
+if [[ -n "$LABEL" ]]; then
+    echo "${END_TIME} ${LABEL}" > "$TIMER_FILE"
+else
+    echo "${END_TIME}" > "$TIMER_FILE"
+fi
+
+MINS=$(( TOTAL_SECS / 60 ))
+SECS=$(( TOTAL_SECS % 60 ))
+printf "Timer set: %d:%02d\n" $MINS $SECS
+
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+CUSTOM_ALARM="$SCRIPT_DIR/alarm.mp3"
+
+(
+    sleep "$TOTAL_SECS"
+    rm -f "$TIMER_FILE"
+
+    TITLE="${LABEL:-Timer}"
+    notify-send -u critical -t 0 "⏰ $TITLE" "Time's up!" 2>/dev/null
+
+    if [[ -f "$CUSTOM_ALARM" ]]; then
+        ffplay -nodisp -autoexit -loglevel quiet "$CUSTOM_ALARM"
+    else
+        pw-play /run/current-system/sw/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga 2>/dev/null \
+            || ffplay -nodisp -autoexit -loglevel quiet \
+                /run/current-system/sw/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga 2>/dev/null \
+            || echo -e "\a"
+    fi
+) &
+disown

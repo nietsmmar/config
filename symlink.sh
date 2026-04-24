@@ -19,6 +19,7 @@ function make_symlink {
 }
 
 make_symlink i3/config .i3/config
+make_symlink i3/i3status.conf .config/i3status/config
 make_symlink bash/bashrc .bashrc
 make_symlink kitty/kitty.conf .config/kitty/kitty.conf
 make_symlink i3/picom_config .i3/picom_config
@@ -35,3 +36,5 @@ make_symlink theme/gtk-3.0/gtk-dark.css .config/gtk-3.0/gtk-dark.css
 make_symlink gemini/settings.json .gemini/settings.json
 make_symlink desktop/background-image .background-image
 make_symlink claude/.claude.json .claude.json
+make_symlink xdg/user-dirs.dirs .config/user-dirs.dirs
+make_symlink xdg/user-dirs.conf .config/user-dirs.conf

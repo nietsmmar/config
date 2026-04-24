@@ -8,29 +8,11 @@
 #
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
-set $modeOne Mod4
-set $modeTwo Mod1
+set $super Mod4
+set $alt Mod1
 
 set $monitor1 DP-2-8
 set $monitor2 DP-2-1-1
-
-workspace 1:main output $monitor1
-workspace 1 output $monitor1
-workspace 2:telegram output $monitor2
-workspace 2 output $monitor2
-workspace 3:study output $monitor1
-workspace 3 output $monitor1
-workspace 4:mail output $monitor2
-workspace 4 output $monitor2
-workspace 5:music output $monitor2
-workspace 5 output $monitor2
-workspace 7:scripts output $monitor1
-workspace 7 output $monitor1
-workspace 8 output $monitor2
-workspace 9 output $monitor2
-workspace 10 output $monitor2
-
-#exec --no-startup-id compton # no tearing windows
 
 # setting Apps floating
 #for_window [class="Skype" instance="skype"] floating enable
@@ -40,51 +22,42 @@ for_window [window_role="pop-up"] floating enable
 for_window [class="Xfce4-notifyd"] floating enable; border none
 for_window [title="Android Emulator$"] floating enable; border none
 
-
-
 # start Apps on specific Workspace
-assign [id=25165825] → 5:music
+assign [class="Spotify"] → 5:music
 assign [class="TelegramDesktop" instance="Telegram"] → 2:telegram
 assign [class="Slack" instance="slack"] → 2:telegram
 
 assign [class="Lxappearance" instance="lxappearance"] ~
-assign [class="Thunderbird" instance="Mail"] → 4:mail
-assign [class="Thunderbird" instance="Dialog"] → 4:mail
-
-# mutliple monitors
-#force_xinerama yes
-#exec xrandr --output VGA-1 --auto --left-of DVI-I-1
-#exec xrandr --output DFP5 --auto --left-of CRT1
+assign [class="Betterbird" instance="Mail"] → 4:mail
+assign [class="Betterbird" instance="Dialog"] → 4:mail
 
 # disable titlebar
-new_window 1pixel
+default_border pixel 1
 for_window [class="^.*"] border pixel 1
 
 # browse through workspaces
-bindsym $modeTwo+Shift+a workspace prev
-bindsym $modeTwo+Shift+s workspace next
+bindsym $alt+Shift+a workspace prev
+bindsym $alt+Shift+s workspace next
 
 # move to workspace
-bindsym $modeTwo+$modeOne+Shift+a move workspace prev
-bindsym $modeTwo+$modeOne+Shift+s move workspace next
-
-
+bindsym $alt+$super+Shift+a move workspace prev
+bindsym $alt+$super+Shift+s move workspace next
 
 # font for window titles. ISO 10646 = Unicode
 font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 #font pango: Dejavu Sans Mono 10
 
-# Use Mouse+$modeOne to drag floating windows to their wanted position
-floating_modifier $modeTwo
+# Use Mouse+$super to drag floating windows to their wanted position
+floating_modifier $alt
 
 # start a terminal
-bindsym $modeOne+space exec kitty
+bindsym $super+space exec kitty
 
 # kill focused window
-bindsym $modeTwo+Shift+Q kill
+bindsym $alt+Shift+Q kill
 
 # start dmenu (a program launcher)
-bindsym $modeOne+d exec dmenu_run
+bindsym $super+d exec dmenu_run
 
 # start NetworkManager
 exec --no-startup-id nm-applet
@@ -98,10 +71,7 @@ exec --no-startup-id ~/dev/config/screenlayout/daisy.sh
 # start picom for laptop
 exec --no-startup-id picom --config ~/.i3/picom_config
 
-#exec_always --no-startup-id picom  -b --config ~/.config/picom.conf
-
 # start flux
-#exec xflux -l 49.0047222 -g 8.3858333
 exec redshift -l 49.0047222:8.3858333
 
 # lock Screen after 15 minutes inactivity
@@ -111,79 +81,82 @@ exec --no-startup-id $HOME/dev/config/scripts/prevent_display_sleep_on_audio.sh 
 # fix mouse sensitivity
 exec xinput --set-prop 15 329 -0.3
 
+# toggle touchpad
+bindsym $super+t exec ~/dev/config/scripts/toggle-touchpad
+
 # change focus
-bindsym $modeOne+j focus left
-bindsym $modeOne+k focus down
-bindsym $modeOne+l focus up
-bindsym $modeOne+odiaeresis focus right
+bindsym $super+j focus left
+bindsym $super+k focus down
+bindsym $super+l focus up
+bindsym $super+odiaeresis focus right
 
 # alternatively, you can use the cursor keys:
-bindsym $modeOne+Left focus left
-bindsym $modeOne+Down focus down
-bindsym $modeOne+Up focus up
-bindsym $modeOne+Right focus right
+bindsym $super+Left focus left
+bindsym $super+Down focus down
+bindsym $super+Up focus up
+bindsym $super+Right focus right
 
 # move focused window
-bindsym $modeOne+Shift+J move left
-bindsym $modeOne+Shift+K move down
-bindsym $modeOne+Shift+L move up
-bindsym $modeOne+Shift+Odiaeresis move right
+bindsym $super+Shift+J move left
+bindsym $super+Shift+K move down
+bindsym $super+Shift+L move up
+bindsym $super+Shift+Odiaeresis move right
 
 # alternatively, you can use the cursor keys:
-bindsym $modeOne+Shift+Left move left
-bindsym $modeOne+Shift+Down move down
-bindsym $modeOne+Shift+Up move up
-bindsym $modeOne+Shift+Right move right
+bindsym $super+Shift+Left move left
+bindsym $super+Shift+Down move down
+bindsym $super+Shift+Up move up
+bindsym $super+Shift+Right move right
 
 # split in horizontal orientation
-bindsym $modeTwo+h split h
+bindsym $alt+h split h
 
 # split in vertical orientation
-bindsym $modeTwo+v split v
+bindsym $alt+v split v
 
 # enter fullscreen mode for the focused container
-bindsym $modeTwo+f fullscreen
+bindsym $alt+f fullscreen
 
 # change container layout (stacked, tabbed, default)
-#bindsym $modeTwo+s layout stacking
-bindsym $modeOne+w layout tabbed
-bindsym $modeOne+e layout default
+#bindsym $alt+s layout stacking
+bindsym $super+w layout tabbed
+bindsym $super+e layout default
 
 # toggle tiling / floating
-bindsym $modeOne+Shift+space floating toggle
+bindsym $super+Shift+space floating toggle
 
 # change focus between tiling / floating windows
-bindsym $modeTwo+x focus mode_toggle
+bindsym $alt+x focus mode_toggle
 
 # focus the parent container
-bindsym $modeTwo+a focus parent
+bindsym $alt+a focus parent
 
 # focus the child container
-bindsym $modeOne+$modeTwo+a focus child
+bindsym $super+$alt+a focus child
 
 # switch to workspace
-bindsym $modeOne+1 workspace 1:main
-bindsym $modeOne+2 workspace 2:telegram
-bindsym $modeOne+3 workspace 3:study
-bindsym $modeOne+4 workspace 4:mail
-bindsym $modeOne+5 workspace 5:music
-bindsym $modeOne+6 workspace 6:trello
-bindsym $modeOne+7 workspace 7:scripts
-bindsym $modeOne+8 workspace 8
-bindsym $modeOne+9 workspace 9
-bindsym $modeOne+0 workspace 10
+bindsym $super+1 workspace 1:main
+bindsym $super+2 workspace 2:telegram
+bindsym $super+3 workspace 3:browsing
+bindsym $super+4 workspace 4:mail
+bindsym $super+5 workspace 5:music
+bindsym $super+6 workspace 6:backend
+bindsym $super+7 workspace 7:scripts
+bindsym $super+8 workspace 8:keepass
+bindsym $super+9 workspace 9
+bindsym $super+0 workspace 10
 
 # move focused container to workspace
-bindsym $modeOne+Shift+exclam move workspace 1:main; workspace 1:main
-bindsym $modeOne+Shift+quotedbl move workspace 2:telegram; workspace 2:telegram
-bindsym $modeOne+Shift+section move workspace 3:study; workspace 3:study
-bindsym $modeOne+Shift+dollar move workspace 4:mail; workspace 4:mail
-bindsym $modeOne+Shift+percent move workspace 5:music; workspace 5:music
-bindsym $modeOne+Shift+ampersand move workspace 6:trello; workspace 6:trello
-bindsym $modeOne+Shift+slash move workspace 7:scripts; workspace 7:scripts
-bindsym $modeOne+Shift+parenleft move workspace 8; workspace 8
-bindsym $modeOne+Shift+parenright move workspace 9; workspace 9
-bindsym $modeOne+Shift+equal move workspace 10; workspace 10
+bindsym $super+Shift+exclam move workspace 1:main; workspace 1:main
+bindsym $super+Shift+quotedbl move workspace 2:telegram; workspace 2:telegram
+bindsym $super+Shift+section move workspace 3:browsing; workspace 3:browsing
+bindsym $super+Shift+dollar move workspace 4:mail; workspace 4:mail
+bindsym $super+Shift+percent move workspace 5:music; workspace 5:music
+bindsym $super+Shift+ampersand move workspace 6:backend; workspace 6:backend
+bindsym $super+Shift+slash move workspace 7:scripts; workspace 7:scripts
+bindsym $super+Shift+parenleft move workspace 8:keepass; workspace 8:keepass
+bindsym $super+Shift+parenright move workspace 9; workspace 9
+bindsym $super+Shift+equal move workspace 10; workspace 10
 
 # Multimedia Keys
 # increase volume
@@ -192,22 +165,23 @@ bindsym XF86AudioRaiseVolume exec amixer -q set Master 5%+ unmute
 bindsym XF86AudioLowerVolume exec amixer -q set Master 5%- unmute
 # mute volume
 bindsym XF86AudioMute exec amixer -q set Master toggle
+# brightness
+bindsym XF86MonBrightnessUp   exec brightnessctl set 5%+
+bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
 # pause / play
 #bindsym XF86AudioPlay exec playerctl play-pause
 bindcode 127 exec playerctl play-pause
 
 
 # reload the configuration file
-bindsym $modeTwo+Shift+C reload
+bindsym $alt+Shift+C reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $modeOne+Shift+R restart
+bindsym $super+Shift+R restart
 # exit i3 (logs you out of your X session)
-bindsym $modeOne+Shift+E exit
+bindsym $super+Shift+E exit
 
 # lockscreen
-bindsym $modeTwo+Shift+L exec lockScreen
-
-#screenshot todo
+bindsym $alt+Shift+L exec lockScreen
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -246,10 +220,10 @@ mode "resize" {
 		bindsym Escape mode "default"
 }
 
-bindsym $modeOne+$modeTwo+r mode "resize"
+bindsym $super+$alt+r mode "resize"
 
 mode "gameMode" {
-    bindsym $modeOne+Escape mode "default", exec xautolock -time 15 -locker lockScreen &
+    bindsym $super+Escape mode "default", exec xautolock -time 15 -locker lockScreen &
     # Multimedia Keys
     # increase volume
     bindsym XF86AudioRaiseVolume exec amixer -q set Master 5%+ unmute
@@ -261,18 +235,14 @@ mode "gameMode" {
     #bindsym XF86AudioPlay exec playerctl play-pause
     bindcode 127 exec playerctl play-pause
 }
-bindsym $modeOne+Escape mode "gameMode", exec --no-startup-id killScreenSaver
-
-# mouse speed
-#exec xinput --set-prop 12 297 -0.8
-exec python ~/scripts/mouseFix.py
+bindsym $super+Escape mode "gameMode", exec --no-startup-id killScreenSaver
 
 #background color
 exec hsetroot -solid #000000
 
 mode "startPrograms" {
     bindsym t exec Telegram; mode "default"
-    bindsym e exec thunderbird; mode "default"
+    bindsym e exec betterbird; mode "default"
     bindsym g exec firefox -private-window; mode "default"
     bindsym y exec spotify; mode "default"
     bindsym h exec startProgram; mode "default"
@@ -282,45 +252,23 @@ mode "startPrograms" {
     bindsym i exec inkscape; mode "default"
     bindsym n exec nautilus; mode "default"
     bindsym f exec google-chrome-stable --incognito; mode "default"
-    bindsym r exec gksudo system-config-printer; mode "default"
     bindsym u exec xmodmap ~/dev/config/xmodmap/xmodmap; mode "default"
     bindsym q exec ~/dev/config/screenlayout/daisy.sh; mode "default"
     bindsym d exec ~/dev/config/screenlayout/pc.sh; mode "default"
     bindsym a exec ~/dev/config/screenlayout/config.sh; mode "default"
     bindsym x exec slack; mode "default"
-    bindsym w exec weather; mode "default"
     bindsym p exec flameshot gui; mode "default"
-    bindsym $modeOne+g mode "default"
+    bindsym $super+g mode "default"
 }
-bindsym $modeOne+g mode "startPrograms" 
-#, exec startProgram
-
-# Color palette used for the terminal ( ~/.Xresources file )
-set_from_resource $term_background background
-set_from_resource $term_foreground foreground
-set_from_resource $term_color0     color0
-set_from_resource $term_color1     color1
-set_from_resource $term_color2     color2
-set_from_resource $term_color3     color3
-set_from_resource $term_color4     color4
-set_from_resource $term_color5     color5
-set_from_resource $term_color6     color6
-set_from_resource $term_color7     color7
-set_from_resource $term_color8     color8
-set_from_resource $term_color9     color9
-set_from_resource $term_color10    color10
-set_from_resource $term_color11    color11
-set_from_resource $term_color12    color12
-set_from_resource $term_color13    color13
-set_from_resource $term_color14    color14
-set_from_resource $term_color15    color15
+bindsym $super+g mode "startPrograms" 
+#, exec startProgramC
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available
 #tray output
 bar {
 	i3bar_command i3bar
-	status_command i3status
+	status_command ~/dev/config/scripts/i3status_timer
 	position bottom
 
 ## please set your primary output first. Example: 'xrandr --output eDP1 --primary'
@@ -329,13 +277,13 @@ bar {
 
 	bindsym button4 nop
 	bindsym button5 nop
-#   font xft:URWGothic-Book 11
+    font pango:Iosevka 10
 	strip_workspace_numbers yes
 
     colors {
         background #222D31
         statusline #F9FAF9
-        separator  #454947mm
+        separator  #16a085
 
 #                      border  backgr. text
         focused_workspace  #F9FAF9 #16a085 #292F34
@@ -347,7 +295,7 @@ bar {
 }
 
 # hide/unhide i3status bar
-bindsym $modeOne+m bar mode toggle
+bindsym $super+m bar mode toggle
 
 # Theme colors
 # class                   border  backgr. text    indic.   child_border
@@ -356,5 +304,4 @@ bindsym $modeOne+m bar mode toggle
   client.unfocused        #2F3D44 #2F3D44 #1ABC9C #454948
   client.urgent           #CB4B16 #FDF6E3 #1ABC9C #268BD2
   client.placeholder      #000000 #0c0c0c #ffffff #000000 
-
   client.background       #2B2C2B

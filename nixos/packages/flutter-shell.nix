@@ -8,6 +8,7 @@ pkgs.mkShell {
     clang
     cmake
     ninja
+    binutils # provides ld.bfd (LLD 21 is incompatible with Flutter's engine .so)
     pkg-config
     gtk3
     webkitgtk_4_1
@@ -32,6 +33,13 @@ pkgs.mkShell {
   ];
 
   shellHook = ''
+    # Force GNU ld.bfd — LLD 21 rejects Flutter's pre-compiled libflutter_linux_gtk.so.
+    # Always run `flutter clean` after changing this so cmake regenerates its cache.
+    export LDFLAGS="-fuse-ld=bfd ''${LDFLAGS:-}"
+
+    # sysprof-capture-4 is a private dep of glib-2.0 — provide both outputs
+    export PKG_CONFIG_PATH=${pkgs.sysprof.dev}/lib/pkgconfig:${pkgs.sysprof}/lib/pkgconfig:${pkgs.gst_all_1.gstreamer.dev}/lib/pkgconfig:${pkgs.gst_all_1.gst-plugins-base.dev}/lib/pkgconfig:$PKG_CONFIG_PATH
+
     export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [
       pkgs.libepoxy
       pkgs.fontconfig
@@ -42,7 +50,6 @@ pkgs.mkShell {
       pkgs.gst_all_1.gst-plugins-ugly
       pkgs.gst_all_1.gst-libav
     ]}:$LD_LIBRARY_PATH
-    export PKG_CONFIG_PATH=${pkgs.gst_all_1.gstreamer.dev}/lib/pkgconfig:${pkgs.gst_all_1.gst-plugins-base.dev}/lib/pkgconfig:${pkgs.sysprof.dev}/lib/pkgconfig:$PKG_CONFIG_PATH
     export GST_PLUGIN_SYSTEM_PATH_1_0=${pkgs.gst_all_1.gstreamer.out}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-base}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-good}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-bad}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-ugly}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-libav}/lib/gstreamer-1.0
     export GST_PLUGIN_PATH=${pkgs.gst_all_1.gstreamer.out}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-base}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-good}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-bad}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-plugins-ugly}/lib/gstreamer-1.0:${pkgs.gst_all_1.gst-libav}/lib/gstreamer-1.0
     export GST_PLUGIN_SCANNER=${pkgs.gst_all_1.gstreamer.out}/libexec/gstreamer-1.0/gst-plugin-scanner
