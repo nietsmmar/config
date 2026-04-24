@@ -10,6 +10,14 @@
       overlay = final: prev: {
         betterbird = prev.callPackage ./packages/betterbird/package.nix { };
         android-studio-flutter = prev.callPackage ./packages/android-studio-wrapper.nix { };
+        # Rename "SPR 532" -> "SPR532" in the ccid driver plist so that
+        # tk-safe's epa-wrapper whitelist (which checks for "SPR532") matches.
+        ccid = prev.ccid.overrideAttrs (old: {
+          postInstall = (old.postInstall or "") + ''
+            sed -i 's/SCM Microsystems Inc\. SPR 532/SCM Microsystems Inc. SPR532/g' \
+              $out/pcsc/drivers/ifd-ccid.bundle/Contents/Info.plist
+          '';
+        });
       };
     in
     rec {

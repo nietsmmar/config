@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# i3status wrapper that injects a timer countdown block into the bar.
+# Reads /tmp/i3timer (written by the `timer` script).
+
+TIMER_FILE=/tmp/i3timer
+
+get_timer_json() {
+    [[ -f "$TIMER_FILE" ]] || return
+
+    read -r END_TIME LABEL < "$TIMER_FILE"
+    local NOW REMAINING MINS SECS TEXT COLOR
+
+    NOW=$(date +%s)
+    REMAINING=$(( END_TIME - NOW ))
+
+    if [[ $REMAINING -le 0 ]]; then
+        rm -f "$TIMER_FILE"
+        printf '{"full_text":"⏰ DONE","color":"#ff4444","urgent":true}'
+        return
+    fi
+
+    MINS=$(( REMAINING / 60 ))
+    SECS=$(( REMAINING % 60 ))
+
+    if [[ -n "$LABEL" ]]; then
+        TEXT=$(printf "⏱ %s %d:%02d" "$LABEL" $MINS $SECS)
+    else
+        TEXT=$(printf "⏱ %d:%02d" $MINS $SECS)
+    fi
+
+    if [[ $REMAINING -le 60 ]]; then
+        COLOR="#ff6600"
+    else
+        COLOR="#16a085"
+    fi
+
+    printf '{"full_text":"%s","color":"%s"}' "$TEXT" "$COLOR"
+}
+
+i3status --config ~/.config/i3status/config | while IFS= read -r line; do
+    # Pass through header and structural lines unchanged
+    if [[ "$line" == '{"version"'* ]] || [[ "$line" == "[" ]] || [[ -z "$line" ]]; then
+        echo "$line"
+        continue
+    fi
+
+    TIMER_JSON=$(get_timer_json)
+
+    if [[ -n "$TIMER_JSON" ]]; then
+        # Inject timer block at the front of the status array.
+        # Lines are either "[{...}]" (first) or ",[{...}]" (subsequent).
+        if [[ "$line" == ",["* ]]; then
+            echo ",[${TIMER_JSON},${line:2}"
+        else
+            echo "[${TIMER_JSON},${line:1}"
+        fi
+    else
+        echo "$line"
+    fi
+done

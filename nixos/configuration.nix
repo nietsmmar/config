@@ -165,9 +165,18 @@
   # make iphone mount
   services.usbmuxd.enable = true;
 
+  # PC/SC smart card daemon — required for eGK card reader (Identiv SPR332 v2)
+  services.pcscd.enable = true;
+
+  # udev rule for Identiv SPR532 (04e6:e003) — grants pcscd access to the reader
+  services.udev.extraRules = ''
+    SUBSYSTEMS=="usb", ATTRS{idVendor}=="04e6", ATTRS{idProduct}=="e003", GROUP="pcscd", MODE="0660", TAG+="uaccess"
+  '';
+
   virtualisation.docker.enable = true;
 
   environment.systemPackages = with pkgs; [
+      brightnessctl
       libmbim # mobile sim
       kdePackages.okular
       supabase-cli
@@ -246,6 +255,7 @@
       postman
       claude-code
       stripe-cli
+      tk-safe
   ];
 
   # qt

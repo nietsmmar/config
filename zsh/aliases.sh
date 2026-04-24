@@ -40,8 +40,7 @@ alias imt="kitty +kitten icat"
 alias ka="killall"
 alias shut="sudo shutdown -h 0"
 
-alias timer="$CONFIG/scripts/timer/timer.sh"
-alias timerAt="$CONFIG/scripts/timer/timerAt.sh"
+alias timer="$CONFIG/scripts/timer"
 
 alias canibuy="bash ~/resource/finances/showBudget"
 
