@@ -6,10 +6,13 @@
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
-  #boot.blacklistedKernelModules = [ "nouveau" ];
-  #boot.extraModulePackages = [ config.hardware.nvidia.package ];
+  # Pin to 6.12 LTS kernel — 6.18 causes boot hang with NVIDIA drivers
+  boot.kernelPackages = pkgs.linuxPackages_6_12;
 
-  #boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+  boot.blacklistedKernelModules = [ "nouveau" ];
+  boot.extraModulePackages = [ config.boot.kernelPackages.nvidiaPackages.legacy_580 ];
+  boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+  boot.kernelParams = [ "nvidia-drm.modeset=1" ];
 
   # noisetorch (nosie cancelling for mic)
   programs.noisetorch.enable = true;
@@ -21,8 +24,6 @@
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
 
-  #boot.kernelParams = [ "nvidia-drm.modeset=1" ];
-  
   services.xserver.videoDrivers = ["nvidia"];
   hardware.nvidia = {
     # Modesetting is required.
@@ -51,8 +52,8 @@
 	  # accessible via `nvidia-settings`.
     nvidiaSettings = true;
 
-    # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # GTX 1050 Ti dropped from 595.x+ drivers, use legacy_580
+    package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
   };
 
   # graphics
