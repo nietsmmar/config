@@ -11,8 +11,18 @@
 set $super Mod4
 set $alt Mod1
 
+set $laptop   eDP-1
 set $monitor1 DP-2-8
 set $monitor2 DP-2-1-1
+
+workspace "1:main"     output $monitor1                                                                                                                                                      
+workspace "2:telegram" output $monitor2
+workspace "3:browsing" output $monitor1                                                                                                                                                      
+workspace "4:mail"     output $monitor2
+workspace "5:music"    output $monitor2                                                                                                                                                      
+workspace "6:backend"  output $laptop
+workspace "7:scripts"  output $monitor1                                                                                                                                                      
+workspace "8:keepass"  output $monitor2
 
 # setting Apps floating
 #for_window [class="Skype" instance="skype"] floating enable
