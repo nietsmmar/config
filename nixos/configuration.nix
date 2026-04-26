@@ -256,6 +256,7 @@
       claude-code
       stripe-cli
       tk-safe
+      jq
   ];
 
   # qt
