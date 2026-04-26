@@ -264,6 +264,7 @@ mode "startPrograms" {
     bindsym f exec google-chrome-stable --incognito; mode "default"
     bindsym u exec xmodmap ~/dev/config/xmodmap/xmodmap; mode "default"
     bindsym q exec ~/dev/config/screenlayout/daisy.sh; mode "default"
+    bindsym d exec ~/dev/config/screenlayout/pc.sh; mode "default"
     bindsym a exec ~/dev/config/screenlayout/config.sh; mode "default"
     bindsym x exec slack; mode "default"
     bindsym p exec flameshot gui; mode "default"
