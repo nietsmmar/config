@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SRC="/run/media/xunil/T7 Shield/post/"
+DST="/run/media/xunil/VOB_cinema/post/"
+
+if [[ ! -d "$SRC" ]]; then
+    echo "Error: source not found: $SRC"
+    exit 1
+fi
+
+if [[ ! -d "$DST" ]]; then
+    echo "Error: destination not found: $DST"
+    exit 1
+fi
+
+rsync -av --progress "$SRC" "$DST"
