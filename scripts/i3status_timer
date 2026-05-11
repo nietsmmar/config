@@ -37,6 +37,28 @@ get_timer_json() {
     printf '{"full_text":"%s","color":"%s"}' "$TEXT" "$COLOR"
 }
 
+filter_blocks() {
+    local line="$1"
+    # Lines are either "[{...}]" (first) or ",[{...}]" (subsequent).
+    # Strip the leading "," if present, filter with jq, then restore it.
+    # Fall back to unmodified line if jq fails for any reason.
+    local arr filtered
+    if [[ "$line" == ",["* ]]; then
+        arr="${line:1}"
+        if filtered=$(jq -c '[.[] | select(.full_text != "No battery")]' <<< "$arr" 2>/dev/null); then
+            echo ",$filtered"
+        else
+            echo "$line"
+        fi
+    else
+        if filtered=$(jq -c '[.[] | select(.full_text != "No battery")]' <<< "$line" 2>/dev/null); then
+            echo "$filtered"
+        else
+            echo "$line"
+        fi
+    fi
+}
+
 i3status --config ~/.config/i3status/config | while IFS= read -r line; do
     # Pass through header and structural lines unchanged
     if [[ "$line" == '{"version"'* ]] || [[ "$line" == "[" ]] || [[ -z "$line" ]]; then
@@ -50,11 +72,11 @@ i3status --config ~/.config/i3status/config | while IFS= read -r line; do
         # Inject timer block at the front of the status array.
         # Lines are either "[{...}]" (first) or ",[{...}]" (subsequent).
         if [[ "$line" == ",["* ]]; then
-            echo ",[${TIMER_JSON},${line:2}"
+            line=",[${TIMER_JSON},${line:2}"
         else
-            echo "[${TIMER_JSON},${line:1}"
+            line="[${TIMER_JSON},${line:1}"
         fi
-    else
-        echo "$line"
     fi
+
+    filter_blocks "$line"
 done

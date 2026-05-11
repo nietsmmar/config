@@ -76,7 +76,7 @@ exec --no-startup-id nm-applet
 exec --no-startup-id xmodmap ~/dev/config/xmodmap
 
 # start xrandr screen config
-exec --no-startup-id ~/dev/config/screenlayout/daisy.sh
+exec --no-startup-id ~/dev/config/screenlayout/startup.sh
 
 # start picom for laptop
 exec --no-startup-id picom --config ~/.i3/picom_config
