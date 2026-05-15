@@ -151,6 +151,12 @@
   services.tumbler.enable = true; # thumbnails support
   programs.dconf.enable = true;
 
+  # required for flameshot (v14+) to access org.freedesktop.portal.Desktop for screen capture
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
+
   # fix gstreamer audio/video properties in nautilus
   environment.sessionVariables.GST_PLUGIN_SYSTEM_PATH_1_0 = lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" (with pkgs.gst_all_1; [
     gst-plugins-good
