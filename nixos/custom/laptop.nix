@@ -39,6 +39,8 @@
     "nmi_watchdog=1"
   ];
 
+  services.fwupd.enable = true;
+
   services.blueman.enable = true;
   hardware.bluetooth = {
     enable = true;

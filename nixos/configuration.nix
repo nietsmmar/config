@@ -119,7 +119,19 @@
 
   # printing
   services.printing.enable = true;
-  services.ipp-usb.enable=true; #usb
+  services.ipp-usb.enable = true;
+
+  hardware.printers = {
+    ensurePrinters = [
+      {
+        name = "HP_ENVY_4520";
+        location = "Home";
+        deviceUri = "ipp://HP705A0F6C29F1.local:631/ipp/print";
+        model = "everywhere";
+      }
+    ];
+    ensureDefaultPrinter = "HP_ENVY_4520";
+  };
 
   services.avahi = {
     enable = true;
