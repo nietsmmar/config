@@ -275,6 +275,7 @@
       stripe-cli
       tk-safe
       jq
+      gedit
   ];
 
   # qt

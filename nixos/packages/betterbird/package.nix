@@ -12,10 +12,11 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "betterbird";
   version = "140.7.0esr-bb17";
 
-  src = fetchurl {
-    url = "https://betterbird.eu/downloads/LinuxArchive/Previous/betterbird-140.7.0esr-bb17.en-US.linux-x86_64.tar.xz";
-    hash = "sha256-dTEMtZ1QkEkn4TfsL6+4U9bVTB3o2JIsammpAT5Gfmk=";
-  };
+  # src = fetchurl {
+  #   url = "https://betterbird.eu/downloads/LinuxArchive/Previous/betterbird-140.7.0esr-bb17.en-US.linux-x86_64.tar.xz";
+  #   hash = "sha256-dTEMtZ1QkEkn4TfsL6+4U9bVTB3o2JIsammpAT5Gfmk=";
+  # };
+  src = ./betterbird-140.7.0esr-bb17.en-US.linux-x86_64.tar.xz;
 
   nativeBuildInputs = [
     autoPatchelfHook
