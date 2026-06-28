@@ -25,14 +25,21 @@
     # Falls back to the legacy submission path which is more stable.
     "i915.enable_guc=0"
 
-    # Disable Panel Self Refresh — #1 cause of i915 display pipeline freezes
+    # Disable Panel Self Refresh — common cause of i915 display pipeline freezes
     # on Alder Lake P laptops after suspend/hibernate resume.
     "i915.enable_psr=0"
+
+    # Disable display C-states — prevents GPU power transitions from disrupting
+    # the DisplayPort MST link used for daisy-chained monitors. Tradeoff: slightly
+    # higher idle power draw.
+    "i915.enable_dc=0"
 
     # Enable NMI watchdog — fires even during a complete CPU lockup and prints
     # a stack trace to the kernel log, helping diagnose future freezes.
     "nmi_watchdog=1"
   ];
+
+  services.fwupd.enable = true;
 
   services.blueman.enable = true;
   hardware.bluetooth = {
@@ -78,14 +85,30 @@
     VK_ICD_FILENAMES = "/run/opengl-driver/share/vulkan/icd.d/intel_icd.x86_64.json";
   };
 
-  # Reset GSM modem after resume from suspend
+  # Reset GSM modem after resume from suspend to clear the device-id mismatch.
+  # Waits up to 2 minutes for ModemManager to detect the modem naturally,
+  # using mmcli -L to find any modem rather than assuming index 0.
   systemd.services.modem-resume-reset = {
     description = "Reset GSM modem after resume from suspend";
     after = [ "suspend.target" "hibernate.target" "hybrid-sleep.target" ];
     wantedBy = [ "suspend.target" "hibernate.target" "hybrid-sleep.target" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.modemmanager}/bin/mmcli -m 0 --reset";
+      TimeoutStartSec = 150;
+      ExecStart = pkgs.writeShellScript "modem-reset" ''
+        for i in $(seq 1 60); do
+          sleep 2
+          modem=$(${pkgs.modemmanager}/bin/mmcli -L 2>/dev/null \
+            | grep -oE '/org/freedesktop/ModemManager1/Modem/[0-9]+' \
+            | head -1)
+          if [ -n "$modem" ]; then
+            ${pkgs.modemmanager}/bin/mmcli -m "$modem" --reset
+            exit 0
+          fi
+        done
+        echo "modem not found after 120s" >&2
+        exit 1
+      '';
     };
   };
 

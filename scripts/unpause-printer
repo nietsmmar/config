@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+printers=$(lpstat -p 2>/dev/null | awk '/^printer / {print $2}')
+
+if [[ -z "$printers" ]]; then
+    echo "No printers found."
+    exit 1
+fi
+
+for printer in $printers; do
+    status=$(lpstat -p "$printer" 2>/dev/null)
+    if echo "$status" | grep -qE 'disabled|paused'; then
+        echo "Reactivating: $printer"
+        cupsenable "$printer"
+        lpoptions -d "$printer" > /dev/null 2>&1 || true
+    else
+        echo "Already active: $printer"
+    fi
+done
+
+echo "Done."

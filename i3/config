@@ -71,6 +71,7 @@ bindsym $super+d exec dmenu_run
 
 # start NetworkManager
 exec --no-startup-id nm-applet
+exec --no-startup-id dconf load / < $HOME/dev/config/dconf/settings.ini
 
 # start .Xmodmap
 exec --no-startup-id xmodmap ~/dev/config/xmodmap

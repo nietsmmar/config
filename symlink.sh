@@ -30,11 +30,14 @@ make_symlink zsh/zshenv .zshenv
 make_symlink theme/gtk-4.0/assets .config/gtk-4.0/assets
 make_symlink theme/gtk-4.0/gtk.css .config/gtk-4.0/gtk.css
 make_symlink theme/gtk-4.0/gtk-dark.css .config/gtk-4.0/gtk-dark.css
+make_symlink theme/gtk-4.0/settings.ini .config/gtk-4.0/settings.ini
 make_symlink theme/gtk-3.0/assets .config/gtk-3.0/assets
 make_symlink theme/gtk-3.0/gtk.css .config/gtk-3.0/gtk.css
 make_symlink theme/gtk-3.0/gtk-dark.css .config/gtk-3.0/gtk-dark.css
+make_symlink theme/gtk-3.0/settings.ini .config/gtk-3.0/settings.ini
 make_symlink gemini/settings.json .gemini/settings.json
 make_symlink desktop/background-image .background-image
 make_symlink claude/.claude.json .claude.json
 make_symlink xdg/user-dirs.dirs .config/user-dirs.dirs
 make_symlink xdg/user-dirs.conf .config/user-dirs.conf
+make_symlink flameshot/flameshot.ini .config/flameshot/flameshot.ini

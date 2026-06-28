@@ -119,7 +119,19 @@
 
   # printing
   services.printing.enable = true;
-  services.ipp-usb.enable=true; #usb
+  services.ipp-usb.enable = true;
+
+  hardware.printers = {
+    ensurePrinters = [
+      {
+        name = "HP_ENVY_4520";
+        location = "Home";
+        deviceUri = "ipp://HP705A0F6C29F1.local:631/ipp/print";
+        model = "everywhere";
+      }
+    ];
+    ensureDefaultPrinter = "HP_ENVY_4520";
+  };
 
   services.avahi = {
     enable = true;
@@ -150,6 +162,12 @@
   services.gvfs.enable = true; # mount, trash...
   services.tumbler.enable = true; # thumbnails support
   programs.dconf.enable = true;
+
+  # required for flameshot (v14+) to access org.freedesktop.portal.Desktop for screen capture
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
 
   # fix gstreamer audio/video properties in nautilus
   environment.sessionVariables.GST_PLUGIN_SYSTEM_PATH_1_0 = lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" (with pkgs.gst_all_1; [
@@ -257,6 +275,7 @@
       stripe-cli
       tk-safe
       jq
+      gedit
   ];
 
   # qt
