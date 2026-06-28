@@ -244,6 +244,8 @@ mode "gameMode" {
     # pause / play / next / previous
     #bindsym XF86AudioPlay exec playerctl play-pause
     bindcode 127 exec playerctl play-pause
+    # toggle chrome volume (40% / 100%)
+    bindsym $super+m exec ~/dev/config/scripts/toggle-chrome-volume
 }
 bindsym $super+Escape mode "gameMode", exec --no-startup-id killScreenSaver
 
