@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Adjust external monitor brightness over DDC/CI (all detected displays).
+# Usage: monitor-brightness up|down [step]   (step defaults to 10)
+set -euo pipefail
+
+dir="${1:-up}"
+step="${2:-10}"
+
+case "$dir" in
+  up)   sign="+" ;;
+  down) sign="-" ;;
+  *)    echo "usage: $0 up|down [step]" >&2; exit 1 ;;
+esac
+
+# Detect the i2c bus of every external display DDC/CI can talk to.
+mapfile -t buses < <(ddcutil detect --brief 2>/dev/null | grep -oP '/dev/i2c-\K[0-9]+')
+
+if [ "${#buses[@]}" -eq 0 ]; then
+  notify-send -t 1500 "Monitor brightness" "No DDC/CI display detected"
+  exit 0
+fi
+
+# VCP feature 0x10 = brightness; ddcutil supports relative + / - adjustment.
+for b in "${buses[@]}"; do
+  ddcutil --bus="$b" setvcp 10 "$sign" "$step" 2>/dev/null || true
+done
+
+notify-send -t 1000 -u low "Monitor brightness" "$dir ${step}%"

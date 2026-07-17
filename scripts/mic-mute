@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Toggle the default microphone mute state and show a notification.
+set -euo pipefail
+
+wpctl set-mute @DEFAULT_SOURCE@ toggle
+
+if wpctl get-volume @DEFAULT_SOURCE@ | grep -q MUTED; then
+  notify-send -t 1500 -u low "Microphone" "Muted"
+else
+  notify-send -t 1500 -u low "Microphone" "Unmuted"
+fi

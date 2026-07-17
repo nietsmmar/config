@@ -66,7 +66,7 @@
     isNormalUser = true;
     description = "xunil";
     shell = pkgs.zsh;
-    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "docker" "i2c" ];
   };
 
   
@@ -226,6 +226,19 @@
   services.tumbler.enable = true; # thumbnails support
   programs.dconf.enable = true;
 
+  # Clipboard history — clipmenud daemon; browse/paste via `clipmenu` (dmenu).
+  # Bound to $super+c in the i3 config.
+  services.clipmenu.enable = true;
+
+  # Automount USB drives. udisks2 is the backend; the udiskie frontend is
+  # autostarted from the i3 config (`exec udiskie`) — there's no NixOS system
+  # module for udiskie (that option only exists in home-manager).
+  services.udisks2.enable = true;
+
+  # i2c/DDC-CI access for controlling external monitor brightness (ddcutil).
+  # Loads i2c-dev, creates the `i2c` group (xunil is a member above).
+  hardware.i2c.enable = true;
+
   # required for flameshot (v14+) to access org.freedesktop.portal.Desktop for screen capture
   xdg.portal = {
     enable = true;
@@ -262,6 +275,11 @@
         exec /home/xunil/dev/config/scripts/internet-limit/internet-limit.sh "$@"
       '')
       brightnessctl
+      udiskie # USB automount frontend (autostarted from i3)
+      xclip # clipboard access for ocr-region / color-picker scripts
+      xcolor # screen colour picker (color-picker script)
+      tesseract # OCR engine (ocr-region script; incl. eng+deu data)
+      ddcutil # external monitor brightness over DDC/CI (monitor-brightness script)
       libmbim # mobile sim
       kdePackages.okular
       supabase-cli

@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# dmenu control for the mobile-broadband (GSM) connection. Connects/disconnects
+# the actual NetworkManager profile (same as clicking it in nm-applet), and can
+# show modem status. The gsm profile is detected dynamically.
+set -euo pipefail
+
+# Name of the gsm-type connection profile (e.g. "GSM connection").
+conn="$(nmcli -t -f NAME,TYPE connection show 2>/dev/null \
+  | awk -F: '$2=="gsm"{print $1; exit}')"
+
+if [ -z "${conn:-}" ]; then
+  notify-send "Mobile" "No GSM connection profile found"
+  exit 0
+fi
+
+# Is that profile currently active?
+if nmcli -t -f NAME connection show --active 2>/dev/null | grep -Fxq "$conn"; then
+  active=1; state="connected"
+else
+  active=0; state="disconnected"
+fi
+
+choice=$(printf '%s\n' \
+  "$([ "$active" -eq 1 ] && echo Disconnect || echo Connect) ($state)" \
+  "Status" \
+  | dmenu -i -p "Mobile:")
+
+case "$choice" in
+  Connect*)
+    nmcli radio wwan on
+    if nmcli connection up "$conn" >/dev/null 2>&1; then
+      notify-send -t 2000 "Mobile data" "Connected: $conn"
+    else
+      notify-send -u critical "Mobile data" "Failed to connect: $conn"
+    fi
+    ;;
+  Disconnect*)
+    nmcli connection down "$conn" >/dev/null 2>&1 || true
+    # Also power the modem radio down: saves battery and stops NetworkManager
+    # autoconnect from bringing the profile back up.
+    nmcli radio wwan off
+    notify-send -t 2000 "Mobile data" "Disconnected: $conn (radio off)"
+    ;;
+  Status)
+    modem="$(mmcli -L 2>/dev/null | grep -oE '/Modem/[0-9]+' | grep -oE '[0-9]+' | head -1 || true)"
+    if [ -n "${modem:-}" ]; then
+      info="$(mmcli -m "$modem" 2>/dev/null \
+        | grep -iE 'state|signal quality|operator name|access tech' \
+        | sed 's/^[[:space:]]*//')"
+      notify-send "Modem status" "${info:-No details}"
+    else
+      notify-send "Modem" "No modem detected"
+    fi
+    ;;
+esac

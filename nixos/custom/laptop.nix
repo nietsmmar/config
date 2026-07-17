@@ -103,6 +103,13 @@
   };
   services.xserver.videoDrivers = [ "modesetting" ];
 
+  # autorandr: auto-apply saved display layouts on dock/undock (monitor hotplug).
+  # After a rebuild, save profiles once with the desired layout applied, e.g.:
+  #   autorandr --save docked      (with external monitors connected)
+  #   autorandr --save mobile      (laptop screen only)
+  # It then switches automatically when you dock/undock.
+  services.autorandr.enable = true;
+
   services.picom = { # Enable picom service
     enable = true;
     backend = "xrender"; # Changed to xrender for compatibility

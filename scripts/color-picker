@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Pick a screen pixel colour and copy its hex value to the clipboard.
+set -euo pipefail
+
+color="$(xcolor)" || exit 0
+[ -n "$color" ] || exit 0
+
+printf '%s' "$color" | xclip -selection clipboard
+notify-send "Colour copied" "$color"

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# dmenu power menu: lock, suspend, hibernate, logout, reboot, shutdown.
+# Uses the existing `lockScreen` script for locking.
+set -euo pipefail
+
+choice=$(printf '%s\n' Lock Suspend Hibernate Logout Reboot Shutdown \
+  | dmenu -i -p "Power:")
+
+case "$choice" in
+  Lock)      lockScreen ;;
+  Suspend)   systemctl suspend ;;
+  Hibernate) systemctl hibernate ;;
+  Logout)    i3-msg exit ;;
+  Reboot)    systemctl reboot ;;
+  Shutdown)  systemctl poweroff ;;
+  *)         exit 0 ;;
+esac

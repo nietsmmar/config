@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Select a screen region with flameshot, OCR it, and put the text on the
+# clipboard. Recognises English + German.
+set -euo pipefail
+
+tmp="$(mktemp --suffix=.png)"
+trap 'rm -f "$tmp"' EXIT
+
+# flameshot --raw writes the captured PNG to stdout; empty if cancelled.
+flameshot gui --raw > "$tmp" || exit 0
+[ -s "$tmp" ] || exit 0
+
+text="$(tesseract "$tmp" - -l eng+deu 2>/dev/null)"
+
+# Bail if nothing but whitespace was recognised.
+if [ -z "${text//[[:space:]]/}" ]; then
+  notify-send "OCR" "No text detected"
+  exit 0
+fi
+
+printf '%s' "$text" | xclip -selection clipboard
+notify-send "OCR → clipboard" "$(printf '%s' "$text" | head -c 200)"
