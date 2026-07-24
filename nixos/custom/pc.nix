@@ -3,7 +3,7 @@
 {
   # Bootloader.
   boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
+  boot.loader.grub.device = "/dev/disk/by-id/ata-Samsung_SSD_840_EVO_120GB_S1D5NSAFB35914V";
   boot.loader.grub.useOSProber = true;
 
   # Pin to 6.12 LTS kernel — 6.18 causes boot hang with NVIDIA drivers

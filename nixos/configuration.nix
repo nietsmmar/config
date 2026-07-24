@@ -276,6 +276,8 @@
       tk-safe
       jq
       gedit
+      mumble
+      gamemode
   ];
 
   # qt
