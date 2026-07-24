@@ -7,6 +7,13 @@
 
   boot.initrd.luks.devices."luks-cdc0ad6a-bcc0-4a3c-ab30-a7cbf43cb0a2".device = "/dev/disk/by-uuid/cdc0ad6a-bcc0-4a3c-ab30-a7cbf43cb0a2";
 
+  # Pass TRIM/discard through the LUKS layer so the weekly fstrim.timer actually
+  # reaches the SSD (dm-crypt blocks discards by default). Minor security
+  # tradeoff: reveals which blocks are in use. Applied to both LUKS containers
+  # (the second is declared in the generated hardware/laptop.nix).
+  boot.initrd.luks.devices."luks-cdc0ad6a-bcc0-4a3c-ab30-a7cbf43cb0a2".allowDiscards = true;
+  boot.initrd.luks.devices."luks-e1292fc1-2b30-4470-a79e-3abaf76efbd2".allowDiscards = true;
+
   # Use 6.12 LTS kernel — more stable than 6.18, avoids SLUB alloc_tagging bug
   # causing disk I/O stalls and hard freezes on LUKS-encrypted drives.
   boot.kernelPackages = pkgs.linuxPackages_6_12;
@@ -41,6 +48,37 @@
 
   services.fwupd.enable = true;
 
+  # NOTE: thermald is intentionally NOT enabled. This ThinkPad exposes DYTC
+  # (dytc_lapmode) — the firmware handles adaptive thermal management itself and
+  # thermald refuses to run alongside it. That native mechanism is already
+  # driven via TLP's PLATFORM_PROFILE_ON_AC/BAT settings.
+
+  # Don't suspend when the lid is closed while docked or driving external
+  # displays (this is already the systemd default; set explicitly for clarity).
+  services.logind.lidSwitchDocked = "ignore";
+
+  # Cleanly hibernate before the battery dies (session survives to disk and
+  # resumes on next power-on). Hibernate/resume is already working on this
+  # machine. Fires at 5% based on percentage rather than time-remaining.
+  services.upower = {
+    enable = true;
+    criticalPowerAction = "Hibernate";
+    usePercentageForPolicy = true;
+    percentageLow = 15;
+    percentageCritical = 8;
+    percentageAction = 5;
+  };
+
+  # Blue-light reduction in the evenings (Karlsruhe coords). Previously started
+  # from the i3 config via `exec redshift -l ...`; managed here instead so it's
+  # a proper service — remember to drop the i3 exec line.
+  services.redshift.enable = true;
+  location = {
+    provider = "manual";
+    latitude = 49.0047222;
+    longitude = 8.3858333;
+  };
+
   services.blueman.enable = true;
   hardware.bluetooth = {
     enable = true;
@@ -64,6 +102,13 @@
     ];
   };
   services.xserver.videoDrivers = [ "modesetting" ];
+
+  # autorandr: auto-apply saved display layouts on dock/undock (monitor hotplug).
+  # After a rebuild, save profiles once with the desired layout applied, e.g.:
+  #   autorandr --save docked      (with external monitors connected)
+  #   autorandr --save mobile      (laptop screen only)
+  # It then switches automatically when you dock/undock.
+  services.autorandr.enable = true;
 
   services.picom = { # Enable picom service
     enable = true;

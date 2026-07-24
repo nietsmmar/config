@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# dmenu audio output switcher for PipeWire (wpctl).
+# Lists available sinks by name and sets the chosen one as the default output.
+set -euo pipefail
+
+declare -A sink_ids
+menu=""
+in_sinks=0
+
+while IFS= read -r line; do
+  case "$line" in
+    *"Sinks:"*)   in_sinks=1; continue ;;
+    *"Sources:"*) in_sinks=0 ;;
+  esac
+  [ "$in_sinks" -eq 1 ] || continue
+
+  # Match tree lines like:  │  *   77. Built-in Audio Analog Stereo   [vol: 0.55]
+  if [[ "$line" =~ ([0-9]+)\.\ (.+)\[vol ]]; then
+    id="${BASH_REMATCH[1]}"
+    name="${BASH_REMATCH[2]}"
+    name="${name%"${name##*[![:space:]]}"}"   # trim trailing whitespace
+    sink_ids["$name"]="$id"
+    menu+="$name"$'\n'
+  fi
+done < <(wpctl status)
+
+[ -z "$menu" ] && exit 0
+
+choice=$(printf '%s' "$menu" | dmenu -i -p "Audio out:")
+[ -z "$choice" ] && exit 0
+
+id="${sink_ids[$choice]:-}"
+[ -z "$id" ] && exit 0
+
+wpctl set-default "$id"
+command -v notify-send >/dev/null && notify-send "Audio output" "$choice"

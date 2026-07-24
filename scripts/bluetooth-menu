@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# dmenu Bluetooth menu: connect/disconnect paired devices via bluetoothctl.
+set -euo pipefail
+
+declare -A macs
+menu=""
+
+while IFS= read -r line; do
+  # `bluetoothctl devices` lines look like: "Device AA:BB:.. Name Here"
+  mac="$(awk '{print $2}' <<<"$line")"
+  name="$(cut -d' ' -f3- <<<"$line")"
+  [ -z "$mac" ] && continue
+  if bluetoothctl info "$mac" | grep -q "Connected: yes"; then
+    label="$name (connected)"
+  else
+    label="$name"
+  fi
+  macs["$label"]="$mac"
+  menu+="$label"$'\n'
+done < <(bluetoothctl devices)
+
+[ -z "$menu" ] && { notify-send "Bluetooth" "No paired devices"; exit 0; }
+
+choice=$(printf '%s' "$menu" | dmenu -i -p "Bluetooth:")
+[ -z "$choice" ] && exit 0
+mac="${macs[$choice]:-}"
+[ -z "$mac" ] && exit 0
+
+if bluetoothctl info "$mac" | grep -q "Connected: yes"; then
+  bluetoothctl disconnect "$mac" && notify-send "Bluetooth" "Disconnected: ${choice% (connected)}"
+else
+  bluetoothctl connect "$mac" && notify-send "Bluetooth" "Connected: $choice"
+fi

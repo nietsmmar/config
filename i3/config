@@ -73,6 +73,9 @@ bindsym $super+d exec dmenu_run
 exec --no-startup-id nm-applet
 exec --no-startup-id dconf load / < $HOME/dev/config/dconf/settings.ini
 
+# USB automount (udisks2 backend enabled in NixOS)
+exec --no-startup-id udiskie &
+
 # start .Xmodmap
 exec --no-startup-id xmodmap ~/dev/config/xmodmap
 
@@ -83,7 +86,8 @@ exec --no-startup-id ~/dev/config/screenlayout/startup.sh
 exec --no-startup-id picom --config ~/.i3/picom_config
 
 # start flux
-exec redshift -l 49.0047222:8.3858333
+# redshift is now managed by NixOS (services.redshift in nixos/custom/laptop.nix)
+# exec redshift -l 49.0047222:8.3858333
 
 # lock Screen after 15 minutes inactivity
 exec xautolock -time 15 -locker lockScreen &
@@ -95,25 +99,52 @@ exec xinput --set-prop 15 329 -0.3
 # toggle touchpad
 bindsym $super+t exec ~/dev/config/scripts/toggle-touchpad
 
-# change focus
+# clipboard history (clipmenu, daemon enabled via NixOS)
+bindsym $super+c exec clipmenu
+
+# audio output switcher (dmenu, PipeWire)
+bindsym $super+a exec ~/dev/config/scripts/audio-sink
+
+# power menu (lock/suspend/hibernate/logout/reboot/shutdown)
+bindsym $super+Shift+p exec ~/dev/config/scripts/power-menu
+
+# bluetooth connect/disconnect menu
+bindsym $super+b exec ~/dev/config/scripts/bluetooth-menu
+
+# OCR a screen region to the clipboard (flameshot + tesseract)
+bindsym $super+o exec ~/dev/config/scripts/ocr-region
+
+# pick a screen colour, copy hex to clipboard
+bindsym $super+y exec ~/dev/config/scripts/color-picker
+
+# show this keybinding cheat sheet (and launch any exec binding from it)
+bindsym $super+F1 exec ~/dev/config/scripts/shortcuts
+
+# toggle microphone mute (ThinkPad mic-mute key)
+bindsym XF86AudioMicMute exec ~/dev/config/scripts/mic-mute
+
+# mobile broadband (WWAN) enable/disable + status menu
+bindsym $super+n exec ~/dev/config/scripts/modem-menu
+
+# move focus (j/k/l/ö)
 bindsym $super+j focus left
 bindsym $super+k focus down
 bindsym $super+l focus up
 bindsym $super+odiaeresis focus right
 
-# alternatively, you can use the cursor keys:
+# move focus (arrow keys)
 bindsym $super+Left focus left
 bindsym $super+Down focus down
 bindsym $super+Up focus up
 bindsym $super+Right focus right
 
-# move focused window
+# move focused window (j/k/l/ö)
 bindsym $super+Shift+J move left
 bindsym $super+Shift+K move down
 bindsym $super+Shift+L move up
 bindsym $super+Shift+Odiaeresis move right
 
-# alternatively, you can use the cursor keys:
+# move focused window (arrow keys)
 bindsym $super+Shift+Left move left
 bindsym $super+Shift+Down move down
 bindsym $super+Shift+Up move up
@@ -130,7 +161,9 @@ bindsym $alt+f fullscreen
 
 # change container layout (stacked, tabbed, default)
 #bindsym $alt+s layout stacking
+# layout: tabbed
 bindsym $super+w layout tabbed
+# layout: default (split tiling)
 bindsym $super+e layout default
 
 # toggle tiling / floating
@@ -145,7 +178,7 @@ bindsym $alt+a focus parent
 # focus the child container
 bindsym $super+$alt+a focus child
 
-# switch to workspace
+# switch to workspace (Super+1…0)
 bindsym $super+1 workspace 1:main
 bindsym $super+2 workspace 2:telegram
 bindsym $super+3 workspace 3:browsing
@@ -176,9 +209,12 @@ bindsym XF86AudioRaiseVolume exec amixer -q set Master 5%+ unmute
 bindsym XF86AudioLowerVolume exec amixer -q set Master 5%- unmute
 # mute volume
 bindsym XF86AudioMute exec amixer -q set Master toggle
-# brightness
+# brightness (laptop panel)
 bindsym XF86MonBrightnessUp   exec brightnessctl set 5%+
 bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
+# brightness (external monitors via DDC/CI) — hold Shift
+bindsym Shift+XF86MonBrightnessUp   exec ~/dev/config/scripts/monitor-brightness up
+bindsym Shift+XF86MonBrightnessDown exec ~/dev/config/scripts/monitor-brightness down
 # pause / play
 #bindsym XF86AudioPlay exec playerctl play-pause
 bindcode 127 exec playerctl play-pause
@@ -224,13 +260,15 @@ mode "resize" {
 		bindsym Up resize shrink up 10 px or 10 ppt
 		bindsym Shift+Up resize grow   up 10 px or 10 ppt
 
-		bindsym Right resize shrink right 10 px or 10 ppt		bindsym Shift+Right resize grow   right 10 px or 10 ppt
+		bindsym Right resize shrink right 10 px or 10 ppt
+		bindsym Shift+Right resize grow   right 10 px or 10 ppt
 
 		# back to normal: Enter or Escape
 		bindsym Return mode "default"
 		bindsym Escape mode "default"
 }
 
+# enter resize mode
 bindsym $super+$alt+r mode "resize"
 
 mode "gameMode" {
@@ -248,6 +286,7 @@ mode "gameMode" {
     # toggle chrome volume (40% / 100%)
     bindsym $super+m exec ~/dev/config/scripts/toggle-chrome-volume
 }
+# game mode: toggle no screen-blank/lock (video, presentations)
 bindsym $super+Escape mode "gameMode", exec --no-startup-id killScreenSaver
 
 #background color

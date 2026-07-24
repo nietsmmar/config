@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# dmenu cheat sheet of i3 keybindings. Lists every `bindsym` that has a comment
+# directly above it (so the comment is the description), formatted as
+# "keys  —  description". Selecting an `exec` binding launches it, so this
+# doubles as a launcher for the dmenu scripts. Stays accurate automatically.
+set -euo pipefail
+
+config="$HOME/dev/config/i3/config"
+
+declare -A cmds
+menu=""
+prev_comment=""
+
+while IFS= read -r line; do
+  case "$line" in
+    "#"*)
+      c="${line#\#}"; c="${c# }"
+      case "$c" in
+        bindsym*) prev_comment="" ;;   # ignore commented-out bindings
+        *)        prev_comment="$c" ;;
+      esac
+      ;;
+    "bindsym "*)
+      if [ -n "$prev_comment" ]; then
+        rest="${line#bindsym }"
+        keys="${rest%% *}"
+        cmd="${rest#* }"
+        # prettify the variable names for display
+        disp="${keys//\$super/Super}"
+        disp="${disp//\$alt/Alt}"
+        label="$(printf '%-24s  %s' "$disp" "$prev_comment")"
+        cmds["$label"]="$cmd"
+        menu+="$label"$'\n'
+      fi
+      prev_comment=""
+      ;;
+    "") : ;;               # blank line: keep comment attached to next bindsym
+    *) prev_comment="" ;;  # any other line breaks the comment→bindsym pairing
+  esac
+done < "$config"
+
+choice=$(printf '%s' "$menu" | dmenu -i -l 25 -p "Shortcut:")
+[ -z "$choice" ] && exit 0
+
+cmd="${cmds[$choice]:-}"
+case "$cmd" in
+  exec*) i3-msg "$cmd" >/dev/null ;;  # launchable binding → run it
+  *)     : ;;                          # mode/navigation binding → informational only
+esac
