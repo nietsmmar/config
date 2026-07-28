@@ -14,6 +14,12 @@
   boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
   boot.kernelParams = [ "nvidia-drm.modeset=1" ];
 
+  # CPU frequency governor. Desktop is always on AC, so scale up on demand:
+  # `schedutil` ramps to full clock under load and idles down when not. Set
+  # explicitly because the intel_pstate driver runs in passive mode here, where
+  # the `powersave` governor would otherwise pin every core to its minimum.
+  powerManagement.cpuFreqGovernor = "schedutil";
+
   # noisetorch (nosie cancelling for mic)
   programs.noisetorch.enable = true;
 

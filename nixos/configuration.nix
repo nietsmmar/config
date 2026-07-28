@@ -119,45 +119,6 @@
     wantedBy = [ "default.target" ];
   };
 
-
-  # ── TLP: power management (battery saving + charge threshold) ───────────────
-  # ThinkPad (i7-1255U, intel_pstate). Aggressive power-save on battery to slow
-  # drain when unplugged; charge cap at 80% to preserve battery lifespan while
-  # docked. Charge thresholds use the kernel's native sysfs (natacpi) support.
-  services.tlp = {
-    enable = true;
-    settings = {
-      # Charge thresholds — stop at 80% to reduce wear when permanently docked.
-      # To force a one-off full charge: `sudo tlp fullcharge`.
-      START_CHARGE_THRESH_BAT0 = 75;
-      STOP_CHARGE_THRESH_BAT0 = 80;
-
-      # CPU: let it ramp on AC, favour power saving on battery.
-      CPU_SCALING_GOVERNOR_ON_AC = "powersave";
-      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-      CPU_ENERGY_PERF_POLICY_ON_AC = "balance_performance";
-      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-      CPU_BOOST_ON_AC = 1;
-      CPU_BOOST_ON_BAT = 0;               # no turbo on battery — big drain saver
-      CPU_HWP_DYN_BOOST_ON_AC = 1;
-      CPU_HWP_DYN_BOOST_ON_BAT = 0;
-
-      # Platform / thermal profile.
-      PLATFORM_PROFILE_ON_AC = "balanced";
-      PLATFORM_PROFILE_ON_BAT = "low-power";
-
-      # Runtime power management for PCIe/USB devices on battery.
-      RUNTIME_PM_ON_AC = "auto";
-      RUNTIME_PM_ON_BAT = "auto";
-      PCIE_ASPM_ON_BAT = "powersupersave";
-
-      # WiFi power saving on battery.
-      WIFI_PWR_ON_AC = "off";
-      WIFI_PWR_ON_BAT = "on";
-    };
-  };
-
-
   # ── internet-limit: time-based internet / distraction / Telegram control ────
   # Script + config live in the repo so config edits take effect without a
   # rebuild: scripts/internet-limit/{internet-limit.sh,config.sh}
