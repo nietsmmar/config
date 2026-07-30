@@ -196,6 +196,11 @@
   # module for udiskie (that option only exists in home-manager).
   services.udisks2.enable = true;
 
+  # NTFS read/write support so udisks/Nautilus can mount NTFS drives (via
+  # ntfs-3g). ntfs3g in systemPackages also provides the `ntfsfix` CLI for
+  # clearing the "dirty" flag left by unclean Windows ejects/hibernation.
+  boot.supportedFilesystems = [ "ntfs" ];
+
   # i2c/DDC-CI access for controlling external monitor brightness (ddcutil).
   # Loads i2c-dev, creates the `i2c` group (xunil is a member above).
   hardware.i2c.enable = true;
@@ -236,6 +241,7 @@
         exec /home/xunil/dev/config/scripts/internet-limit/internet-limit.sh "$@"
       '')
       brightnessctl
+      ntfs3g # ntfs-3g mount helper + ntfsfix CLI for NTFS drives
       udiskie # USB automount frontend (autostarted from i3)
       xclip # clipboard access for ocr-region / color-picker scripts
       xcolor # screen colour picker (color-picker script)
@@ -265,6 +271,7 @@
       libnotify
       ocrmypdf
       pdfgrep
+      ripgrep-all
       firefox
       git
       betterbird
