@@ -1,17 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SRC="/run/media/xunil/T7 Shield/post/"
-DST="/run/media/xunil/VOB_cinema/post/"
+SRC_ROOT="/run/media/xunil/T7 Shield"
+DST_ROOT="/run/media/xunil/VOB_cinema"
 
-if [[ ! -d "$SRC" ]]; then
-    echo "Error: source not found: $SRC"
+FOLDERS=(post post_articlett)
+
+if [[ ! -d "$SRC_ROOT" ]]; then
+    echo "Error: source drive not found: $SRC_ROOT"
     exit 1
 fi
 
-if [[ ! -d "$DST" ]]; then
-    echo "Error: destination not found: $DST"
+if [[ ! -d "$DST_ROOT" ]]; then
+    echo "Error: destination drive not found: $DST_ROOT"
     exit 1
 fi
 
-rsync -av --progress "$SRC" "$DST"
+for folder in "${FOLDERS[@]}"; do
+    SRC="$SRC_ROOT/$folder/"
+    DST="$DST_ROOT/$folder/"
+
+    if [[ ! -d "$SRC" ]]; then
+        echo "Error: source not found: $SRC"
+        exit 1
+    fi
+
+    echo "==> Syncing $folder"
+    mkdir -p "$DST"
+    rsync -av --progress "$SRC" "$DST"
+done

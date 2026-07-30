@@ -42,6 +42,8 @@ alias shut="sudo shutdown -h 0"
 
 alias timer="$CONFIG/scripts/timer"
 
+alias se="$CONFIG/scripts/mailsearch '/run/media/xunil/T7 Shield/post'"
+
 alias canibuy="bash ~/resource/finances/showBudget"
 
 alias transfer="rsync --archive --stats --progress --human-readable"

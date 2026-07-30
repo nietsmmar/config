@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# postsearch - live full-text search across (OCR'd) PDFs in a folder.
+#
+# Type a query; every space-separated word is treated as a separate term and
+# the search returns PDFs that contain ALL of them (anywhere in the document,
+# any order). fzf lists the hits with a preview of the matching lines, and
+# Enter opens the selected file in okular at a matching page.
+#
+# Usage:
+#   postsearch [folder] [initial query...]
+#   postsearch                          # search current dir
+#   postsearch ~/post vodafone 2025     # docs containing both words
+#
+# Requirements: pdfgrep, fzf, okular (falls back to xdg-open)
+
+set -uo pipefail
+
+SELF="$(readlink -f "$0")"
+
+# --- internal mode: AND-search, print one representative line per file -------
+if [[ "${1:-}" == "--grep" ]]; then
+    query="$2"; dir="$3"
+    read -ra terms <<<"$query"
+    [[ ${#terms[@]} -eq 0 ]] && exit 0
+
+    files=""; first=1
+    for t in "${terms[@]}"; do
+        # A term matches a file if it appears in the content OR anywhere in its
+        # path (--full-path covers folder names as well as the filename).
+        content="$(pdfgrep --cache -rli -- "$t" "$dir" 2>/dev/null)"
+        names="$(fd --absolute-path --full-path -i -e pdf -- "$t" "$dir" 2>/dev/null)"
+        matches="$(printf '%s\n%s\n' "$content" "$names" | sed '/^$/d' | sort -u)"
+        if [[ $first -eq 1 ]]; then
+            files="$matches"; first=0
+        else
+            files="$(comm -12 <(sort <<<"$files") <(sort <<<"$matches"))"
+        fi
+        [[ -z "$files" ]] && exit 0
+    done
+
+    # emit a representative line per file: <path>:<page>:<text>. Prefer a real
+    # content match (any term); fall back to the filename for name-only hits.
+    pat="$(IFS='|'; echo "${terms[*]}")"
+    while IFS= read -r f; do
+        [[ -z "$f" ]] && continue
+        line="$(pdfgrep --cache -inH -- "$pat" "$f" 2>/dev/null | head -n1)"
+        [[ -z "$line" ]] && line="$f:1:$(basename "$f")"
+        echo "$line"
+    done <<<"$files"
+    exit 0
+fi
+
+# --- internal mode: preview with every term highlighted ---------------------
+if [[ "${1:-}" == "--preview" ]]; then
+    query="$2"; file="$3"
+    read -ra terms <<<"$query"
+    [[ ${#terms[@]} -eq 0 ]] && exit 0
+    # Join terms into ONE alternation regex. pdfgrep uses ERE by default, and
+    # multiple -e patterns are unreliable (it silently drops matches for the
+    # later patterns), so we build "term1|term2|..." instead.
+    pat="$(IFS='|'; echo "${terms[*]}")"
+    # No -n here: single-page scans would just show a noisy "1:"/"1-" prefix.
+    pdfgrep --cache -i -C 2 --color=always -- "$pat" "$file" 2>/dev/null | head -300
+    exit 0
+fi
+
+# --- interactive UI ---------------------------------------------------------
+DIR="${1:-$PWD}"
+if [[ ! -d "$DIR" ]]; then
+    DIR="$PWD"        # first arg wasn't a folder -> it's part of the query
+else
+    shift
+fi
+DIR="$(cd "$DIR" && pwd)"
+QUERY="$*"
+export DIR
+
+if [[ -n "$QUERY" ]]; then
+    INITIAL="\"$SELF\" --grep \"$QUERY\" \"$DIR\""
+else
+    INITIAL=true      # nothing until the user types
+fi
+
+# {1} = file path, {2} = page. okular jumps to the page; xdg-open is a fallback.
+if command -v okular >/dev/null 2>&1; then
+    OPEN='setsid okular --page {2} {1} >/dev/null 2>&1 &'
+else
+    OPEN='setsid xdg-open {1} >/dev/null 2>&1 &'
+fi
+
+# enter opens the doc but keeps the search open (execute-silent, not accept).
+FZF_DEFAULT_COMMAND="$INITIAL" \
+fzf --ansi --disabled --query "$QUERY" \
+    --delimiter : \
+    --bind "change:reload:\"$SELF\" --grep {q} \"$DIR\"" \
+    --bind "enter:execute-silent($OPEN)" \
+    --bind "ctrl-o:execute-silent(setsid nautilus \"\$(dirname {1})\" >/dev/null 2>&1 &)" \
+    --preview "\"$SELF\" --preview {q} {1}" \
+    --preview-window 'down,55%,wrap' \
+    --header 'all words must match  ·  enter: open doc  ·  ctrl-o: open folder  ·  esc: quit'

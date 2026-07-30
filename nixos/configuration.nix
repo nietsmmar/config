@@ -280,6 +280,7 @@
       xcolor # screen colour picker (color-picker script)
       tesseract # OCR engine (ocr-region script; incl. eng+deu data)
       ddcutil # external monitor brightness over DDC/CI (monitor-brightness script)
+      autotiling # auto-alternate i3 split direction (started from i3 config)
       libmbim # mobile sim
       kdePackages.okular
       supabase-cli
