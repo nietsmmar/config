@@ -59,6 +59,14 @@
     };
   };
 
+  # Secret Service (keyring) so apps like the Nextcloud client can persist
+  # their login token across reboots. Bare i3 starts no keyring daemon on its
+  # own, so without this the client has nowhere to store credentials and prompts
+  # for login on every boot. PAM unlocks the keyring with the login password at
+  # the LightDM greeter, so it's transparent (no separate keyring prompt).
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.lightdm.enableGnomeKeyring = true;
+
   console.keyMap = "de";
 
   programs.zsh.enable = true;
