@@ -76,6 +76,10 @@ exec --no-startup-id dconf load / < $HOME/dev/config/dconf/settings.ini
 # USB automount (udisks2 backend enabled in NixOS)
 exec --no-startup-id udiskie &
 
+# autotiling: auto-alternate split direction for tiled containers
+# (leaves tabbed/stacked layouts untouched)
+exec --no-startup-id autotiling
+
 # start .Xmodmap
 exec --no-startup-id xmodmap ~/dev/config/xmodmap
 
@@ -202,16 +206,16 @@ bindsym $super+Shift+parenleft move workspace 8:keepass; workspace 8:keepass
 bindsym $super+Shift+parenright move workspace 9; workspace 9
 bindsym $super+Shift+equal move workspace 10; workspace 10
 
-# Multimedia Keys
+# Multimedia Keys (with on-screen display via dunst progress bar)
 # increase volume
-bindsym XF86AudioRaiseVolume exec amixer -q set Master 5%+ unmute
+bindsym XF86AudioRaiseVolume exec ~/dev/config/scripts/osd volume up
 # decrease volume
-bindsym XF86AudioLowerVolume exec amixer -q set Master 5%- unmute
+bindsym XF86AudioLowerVolume exec ~/dev/config/scripts/osd volume down
 # mute volume
-bindsym XF86AudioMute exec amixer -q set Master toggle
+bindsym XF86AudioMute exec ~/dev/config/scripts/osd volume mute
 # brightness (laptop panel)
-bindsym XF86MonBrightnessUp   exec brightnessctl set 5%+
-bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
+bindsym XF86MonBrightnessUp   exec ~/dev/config/scripts/osd brightness up
+bindsym XF86MonBrightnessDown exec ~/dev/config/scripts/osd brightness down
 # brightness (external monitors via DDC/CI) — hold Shift
 bindsym Shift+XF86MonBrightnessUp   exec ~/dev/config/scripts/monitor-brightness up
 bindsym Shift+XF86MonBrightnessDown exec ~/dev/config/scripts/monitor-brightness down
@@ -273,13 +277,13 @@ bindsym $super+$alt+r mode "resize"
 
 mode "gameMode" {
     bindsym $super+Escape mode "default", exec xautolock -time 15 -locker lockScreen &
-    # Multimedia Keys
+    # Multimedia Keys (with on-screen display)
     # increase volume
-    bindsym XF86AudioRaiseVolume exec amixer -q set Master 5%+ unmute
+    bindsym XF86AudioRaiseVolume exec ~/dev/config/scripts/osd volume up
     # decrease volume
-    bindsym XF86AudioLowerVolume exec amixer -q set Master 5%- unmute
+    bindsym XF86AudioLowerVolume exec ~/dev/config/scripts/osd volume down
     # mute volume
-    bindsym XF86AudioMute exec amixer -q set Master toggle
+    bindsym XF86AudioMute exec ~/dev/config/scripts/osd volume mute
     # pause / play / next / previous
     #bindsym XF86AudioPlay exec playerctl play-pause
     bindcode 127 exec playerctl play-pause

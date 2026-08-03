@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# On-screen display (dunst progress bar) for volume / brightness changes.
+# Repeated presses update the same notification via a dunst stack tag.
+# Usage: osd volume up|down|mute
+#        osd brightness up|down
+set -euo pipefail
+
+step=5
+
+osd() { # tag title value(0-100) icon
+  notify-send -t 1200 -h "string:x-dunst-stack-tag:$1" \
+    -h "int:value:$3" -i "$4" "$2" "$3%"
+}
+
+case "${1:-}" in
+  volume)
+    case "${2:-}" in
+      up)   wpctl set-mute @DEFAULT_SINK@ 0 2>/dev/null || true
+            wpctl set-volume -l 1.0 @DEFAULT_SINK@ "${step}%+" ;;
+      down) wpctl set-mute @DEFAULT_SINK@ 0 2>/dev/null || true
+            wpctl set-volume @DEFAULT_SINK@ "${step}%-" ;;
+      mute) wpctl set-mute @DEFAULT_SINK@ toggle ;;
+      *)    echo "usage: $0 volume up|down|mute" >&2; exit 1 ;;
+    esac
+    out="$(wpctl get-volume @DEFAULT_SINK@)"   # e.g. "Volume: 0.55 [MUTED]"
+    if printf '%s' "$out" | grep -q MUTED; then
+      notify-send -t 1200 -h "string:x-dunst-stack-tag:volume" \
+        -h "int:value:0" -i audio-volume-muted "Volume" "muted"
+    else
+      vol="$(printf '%s' "$out" | awk '{printf "%d", $2*100}')"
+      osd volume "Volume" "$vol" audio-volume-high
+    fi
+    ;;
+  brightness)
+    case "${2:-}" in
+      up)   brightnessctl set "${step}%+" >/dev/null ;;
+      down) brightnessctl set "${step}%-" >/dev/null ;;
+      *)    echo "usage: $0 brightness up|down" >&2; exit 1 ;;
+    esac
+    pct="$(( $(brightnessctl get) * 100 / $(brightnessctl max) ))"
+    osd brightness "Brightness" "$pct" display-brightness-high
+    ;;
+  *)
+    echo "usage: $0 {volume up|down|mute | brightness up|down}" >&2
+    exit 1 ;;
+esac

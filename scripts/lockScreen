@@ -1,6 +1,58 @@
 #!/usr/bin/env zsh
-#scrot /tmp/screen_locked.png
-#convert /tmp/screen_locked.png -scale 10% -scale 1000% /tmp/screen_locked2.png
-#i3lock -i /tmp/screen_locked2.png
-cd $HOME/dev/config/scripts/wallpaper
-i3lock -i $HOME/dev/config/scripts/wallpaper/$(shuf -ezn 1 * | xargs -0 -n1 echo)
+# Lock screen with a random wallpaper shown on the external monitors only.
+# Wallpapers are 3840x1080 (two 1920-wide externals). i3lock draws the image
+# from the top-left of the whole X screen, so we composite it onto a full-size
+# black canvas at the offset of the leftmost external monitor (skipping the
+# laptop panel eDP-*), then feed that to i3lock.
+#
+# The composited canvases are cached so locking is instant; a canvas is only
+# rebuilt when it's missing or the source wallpaper is newer. Run this script
+# with "build" to pre-generate the whole cache.
+
+wallpaper_dir="$HOME/dev/config/scripts/wallpaper"
+cache_dir="$HOME/.cache/lockScreen"
+laptop="eDP"   # internal panel prefix to skip
+
+mkdir -p "$cache_dir"
+
+# Read total screen size and the leftmost external monitor's x offset from a
+# single xrandr call (each xrandr invocation is slow on this box, and
+# --listmonitors is slower still, so we parse the plain output once). The
+# offset also keys the cache, so a monitor rearrangement rebuilds cleanly.
+xr=$(xrandr)
+screen=$(print -r -- "$xr" | grep -oP 'current \K[0-9]+ x [0-9]+' | tr -d ' ')
+screen_w=${screen%x*}
+screen_h=${screen#*x}
+offset_x=$(print -r -- "$xr" | awk -v skip="$laptop" '
+    / connected / && $1 !~ "^" skip {
+        for (i=1; i<=NF; i++)
+            if (match($i, /^[0-9]+x[0-9]+\+[0-9]+\+[0-9]+$/)) {
+                split($i, a, "+")
+                if (min=="" || a[2]<min) min=a[2]
+            }
+    }
+    END { print (min=="" ? 0 : min) }')
+
+# Build the cached canvas for a source image if missing or out of date, then
+# echo its path. zsh's -ot is false for a missing file, so test -e explicitly.
+build_canvas() {
+    local src="$1"
+    local canvas="$cache_dir/${screen_w}x${screen_h}+${offset_x}_${src:t}"
+    if [[ ! -e "$canvas" || "$canvas" -ot "$src" ]]; then
+        convert -size "${screen_w}x${screen_h}" xc:black \
+            "$src" -geometry "+${offset_x}+0" -composite \
+            "$canvas"
+    fi
+    print -r -- "$canvas"
+}
+
+if [[ "$1" == "build" ]]; then
+    for src in "$wallpaper_dir"/*(.); do
+        build_canvas "$src" >/dev/null
+    done
+    echo "Cache built in $cache_dir"
+    exit 0
+fi
+
+src=$(find "$wallpaper_dir" -maxdepth 1 -type f | shuf -n1)
+i3lock -i "$(build_canvas "$src")"

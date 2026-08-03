@@ -42,6 +42,8 @@ alias shut="sudo shutdown -h 0"
 
 alias timer="$CONFIG/scripts/timer"
 
+alias se="$CONFIG/scripts/docsearch $HOME/docs"
+
 alias canibuy="bash ~/resource/finances/showBudget"
 
 alias transfer="rsync --archive --stats --progress --human-readable"

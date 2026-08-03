@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+# docsearch - live full-text search across documents in a folder.
+#
+# Type a query; every space-separated word is a separate term and the search
+# returns files that match ALL of them (any order). A term matches if it is in
+# the file's CONTENT or anywhere in its PATH (folder names + filename).
+#
+# Content search is hybrid, for speed:
+#   - PDFs           -> pdfgrep --cache (fast, light, uses the OCR text layer)
+#   - other docs     -> rga (docx, odt, epub, html, csv, txt, md, ...), run
+#                       ONLY on the non-PDF files so it never walks the PDFs.
+# Name search (fd) covers every file type, including .doc/.xlsx that have no
+# content adapter.
+#
+# Usage:
+#   docsearch [folder] [initial query...]
+#   docsearch ~/docs vodafone 2025    # files matching both words
+#   docsearch --index [folder]        # pre-warm the PDF text cache
+#
+# Requirements: pdfgrep, rga (ripgrep-all), fd, fzf, xdg-open, nautilus
+
+set -uo pipefail
+
+SELF="$(readlink -f "$0")"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/mailsearch"
+
+# Cached recursive file list for a folder. Walking the tree is the slow part on
+# USB/exFAT drives, so we do it once and reuse it (rebuilt if older than 5 min,
+# or on demand via `mailsearch --index`). This keeps live typing snappy.
+file_list() {
+    local dir="$1" key f
+    key="$(printf '%s' "$dir" | sha1sum | cut -d' ' -f1)"
+    f="$CACHE_DIR/list-$key"
+    if [[ "${2:-}" != "--rebuild" && -f "$f" \
+          && $(( $(date +%s) - $(stat -c %Y "$f") )) -lt 300 ]]; then
+        cat "$f"; return
+    fi
+    mkdir -p "$CACHE_DIR"
+    fd --absolute-path --type f . "$dir" 2>/dev/null >"$f"
+    cat "$f"
+}
+
+# --- internal mode: AND-search, print one matching file path per line --------
+#
+# Everything is driven from the cached file list so a search does NO directory
+# walk. Each term filters the candidate set (content via pdfgrep/rga, or name),
+# so multiple words cost about the same as one.
+if [[ "${1:-}" == "--grep" ]]; then
+    query="$2"; dir="$3"
+    read -ra terms <<<"$query"
+    [[ ${#terms[@]} -eq 0 ]] && exit 0
+    [[ ${#query} -lt 2 ]] && exit 0   # don't scan the tree for a single char
+
+    # content match over the candidate file list on stdin -> matching files.
+    # PDFs go to pdfgrep (light, cached); everything else to rga; run together.
+    content_match() {   # $1 = term
+        local t="$1" list pdfs others tp
+        list="$(cat)"
+        pdfs="$(grep -iE '\.pdf$' <<<"$list")"
+        others="$(grep -ivE '\.pdf$' <<<"$list")"
+        tp="$(mktemp)"
+        { [[ -n "$pdfs" ]] && printf '%s\n' "$pdfs" | tr '\n' '\0' \
+            | xargs -0 -r pdfgrep --cache -li -- "$t" 2>/dev/null; } >"$tp" &
+        local pid=$!
+        [[ -n "$others" ]] && printf '%s\n' "$others" | tr '\n' '\0' \
+            | xargs -0 -r rga -l -i -- "$t" 2>/dev/null
+        wait "$pid"; cat "$tp"; rm -f "$tp"
+    }
+
+    candidates="$(file_list "$dir")"
+    for t in "${terms[@]}"; do
+        [[ -z "$candidates" ]] && exit 0
+        names="$(grep -iF -- "$t" <<<"$candidates")"
+        content="$(printf '%s\n' "$candidates" | content_match "$t")"
+        candidates="$(printf '%s\n%s\n' "$names" "$content" | sed '/^$/d' | sort -u)"
+    done
+    printf '%s\n' "$candidates"
+    exit 0
+fi
+
+# --- internal mode: preview with every term highlighted ---------------------
+if [[ "${1:-}" == "--preview" ]]; then
+    query="$2"; file="$3"
+    read -ra terms <<<"$query"
+    [[ ${#terms[@]} -eq 0 ]] && exit 0
+    if [[ "${file,,}" == *.pdf ]]; then
+        # pdfgrep drops matches with multiple -e, so use one alternation regex.
+        pat="$(IFS='|'; echo "${terms[*]}")"
+        out="$(pdfgrep --cache -i -C 2 --color=always -- "$pat" "$file" 2>/dev/null)"
+        # name-only match (term not in content): show the document text instead.
+        [[ -z "$out" ]] && out="$(pdfgrep --cache -h --color=never -- '.' "$file" 2>/dev/null)"
+    else
+        eargs=(); for t in "${terms[@]}"; do eargs+=(-e "$t"); done
+        out="$(rga -i --context 2 --color=always "${eargs[@]}" -- "$file" 2>/dev/null)"
+        [[ -z "$out" ]] && out="$(rga -N --color=never -- '.' "$file" 2>/dev/null)"
+    fi
+    printf '%s\n' "$out" | head -300
+    exit 0
+fi
+
+# --- warm the caches so live search stays fast -------------------------------
+if [[ "${1:-}" == "--index" ]]; then
+    dir="$(cd "${2:-$PWD}" && pwd)"
+    echo "Refreshing file list for: $dir"
+    total="$(file_list "$dir" --rebuild | grep -ciE '\.pdf$')"
+    echo "Warming PDF text cache for $total PDFs"
+    i=0
+    file_list "$dir" | grep -iE '\.pdf$' | while IFS= read -r f; do
+        i=$((i + 1)); printf '\r  %d/%d' "$i" "$total"
+        pdfgrep --cache -q -- 'zzq_no_match_qzz' "$f" 2>/dev/null || true
+    done
+    echo -e "\nDone. Live search will now hit the cache."
+    exit 0
+fi
+
+# --- interactive UI ---------------------------------------------------------
+DIR="${1:-$PWD}"
+if [[ ! -d "$DIR" ]]; then
+    DIR="$PWD"        # first arg wasn't a folder -> it's part of the query
+else
+    shift
+fi
+DIR="$(cd "$DIR" && pwd)"
+QUERY="$*"
+export DIR
+
+if [[ -n "$QUERY" ]]; then
+    INITIAL="\"$SELF\" --grep \"$QUERY\" \"$DIR\""
+else
+    INITIAL=true      # nothing until the user types
+fi
+
+# {} is the whole line = the file path (paths may contain spaces, so no fields).
+FZF_DEFAULT_COMMAND="$INITIAL" \
+fzf --ansi --disabled --query "$QUERY" \
+    --bind "change:reload(sleep 0.3; \"$SELF\" --grep {q} \"$DIR\")" \
+    --bind "enter:execute-silent(setsid xdg-open {} >/dev/null 2>&1 &)" \
+    --bind "ctrl-o:execute-silent(setsid nautilus \"\$(dirname {})\" >/dev/null 2>&1 &)" \
+    --preview "\"$SELF\" --preview {q} {}" \
+    --preview-window 'down,55%,wrap' \
+    --header 'all words must match  ·  enter: open  ·  ctrl-o: open folder  ·  esc: quit'
