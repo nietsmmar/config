@@ -15,6 +15,9 @@ set $laptop   eDP-1
 set $monitor1 DP-2-8
 set $monitor2 DP-2-1-1
 
+# Use tabbed containers by default on newly created workspaces.
+workspace_layout tabbed
+
 workspace "1:main"     output $monitor1                                                                                                                                                      
 workspace "2:telegram" output $monitor2
 workspace "3:browsing" output $monitor1                                                                                                                                                      

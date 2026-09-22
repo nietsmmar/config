@@ -138,6 +138,22 @@
       intel-media-driver
       mesa
     ];
+    # 32-bit host libraries Steam's runtime looks for. The desktop's NVIDIA
+    # stack pulls these in implicitly; the Intel laptop doesn't, so Steam warns
+    # about missing .so files. These feed the FHS env's 32-bit side (via the
+    # steam module's extraLibraries → package32/extraPackages32 path). Each entry
+    # maps to one of the missing sonames.
+    extraPackages32 = with pkgs.pkgsi686Linux; [
+      xorg.libXtst      # libXtst.so.6
+      xorg.libXrandr    # libXrandr.so.2
+      xorg.libXrender   # libXrender.so.1
+      xorg.libXi        # libXi.so.6
+      gtk2              # libgtk-x11-2.0.so.0
+      pipewire          # libpipewire-0.3.so.0
+      libpulseaudio     # libpulse.so.0
+      gdk-pixbuf        # libgdk_pixbuf-2.0.so.0
+      libvdpau          # libvdpau.so.1
+    ];
   };
   services.xserver.videoDrivers = [ "modesetting" ];
 
@@ -163,10 +179,6 @@
     vulkan-tools # Vulkan diagnostic tools
     libva-utils # VA-API diagnostic tool
   ];
-
-  environment.sessionVariables = {
-    VK_ICD_FILENAMES = "/run/opengl-driver/share/vulkan/icd.d/intel_icd.x86_64.json";
-  };
 
   # Reset GSM modem after resume from suspend to clear the device-id mismatch.
   # Waits up to 2 minutes for ModemManager to detect the modem naturally,

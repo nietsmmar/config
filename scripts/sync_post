@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SRC_ROOT="/run/media/xunil/T7 Shield"
+SRC_ROOT="$HOME/docs"
 DST_ROOT="/run/media/xunil/VOB_cinema"
 
-FOLDERS=(post post_articlett)
+FOLDERS=(mail mail_articlett)
 
 if [[ ! -d "$SRC_ROOT" ]]; then
     echo "Error: source drive not found: $SRC_ROOT"

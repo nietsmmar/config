@@ -21,6 +21,13 @@
     wantedBy = [ "multi-user.target" "network.target" ];
   };
 
+  # TrackMania Nations Forever LAN/online server.
+  # 2350 = game traffic + LAN discovery broadcast, 3450 = P2P/downloads.
+  # Without these the firewall drops the UDP discovery broadcast, so LAN
+  # clients never see the server on the "Local" tab.
+  networking.firewall.allowedTCPPorts = [ 2350 3450 ];
+  networking.firewall.allowedUDPPorts = [ 2350 3450 ];
+
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
@@ -184,6 +191,13 @@
   # enable nix-ld to fix linker
   programs.nix-ld.enable = true;
 
+  # steam
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+  };
+
   # qt dark-mode
   #qt = {
   #  enable = true;
@@ -306,7 +320,6 @@
       playerctl
       inkscape
       nomacs
-      jetbrains.pycharm-oss
       nautilus
       sushi # previewer for nautilus
       tinysparql # file indexer and search tool
@@ -334,11 +347,11 @@
       kdePackages.kolourpaint
       postman
       claude-code
+      codex
       stripe-cli
       tk-safe
       jq
       gedit
-      mumble
       gamemode
   ];
 

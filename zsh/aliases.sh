@@ -66,3 +66,7 @@ function ns() {
 }
 
 # alias google-chrome-stable='google-chrome-stable --use-vulkan --enable-features=Vulkan,VaapiVideoEncoder'
+
+# Codex modes
+alias cc="codex --sandbox read-only --ask-for-approval on-request"
+alias ce="codex resume --last --sandbox workspace-write --ask-for-approval on-request"

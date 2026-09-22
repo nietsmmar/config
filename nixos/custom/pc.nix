@@ -23,13 +23,6 @@
   # noisetorch (nosie cancelling for mic)
   programs.noisetorch.enable = true;
 
-  # steam 
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
-  };
-
   services.xserver.videoDrivers = ["nvidia"];
   hardware.nvidia = {
     # Modesetting is required.
