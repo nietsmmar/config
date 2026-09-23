@@ -34,9 +34,9 @@
     enable = true;
     xkb.layout = "de";
     displayManager.lightdm.enable = true;
-    desktopManager.mate.enable = true;
+    desktopManager.cinnamon.enable = true;
   };
-  services.displayManager.defaultSession = "mate";
+  services.displayManager.defaultSession = "cinnamon";
 
   services.pipewire = {
     enable = true;
@@ -55,7 +55,7 @@
   programs.firefox.enable = true;
   programs.dconf.enable = true;
 
-  # Prefer Nautilus over MATE's default Caja file manager.
+  # Use Nautilus as the file manager.
   xdg.mime.defaultApplications = {
     "inode/directory" = [ "org.gnome.Nautilus.desktop" ];
     "application/x-gnome-saved-search" = [ "org.gnome.Nautilus.desktop" ];
