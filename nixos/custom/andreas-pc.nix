@@ -13,6 +13,51 @@
     useOSProber = true;
   };
 
+  # Internal data drives. Mount by filesystem UUID so device-name changes do
+  # not affect them, and keep boot working if a drive is temporarily absent.
+  fileSystems."/mnt/foto-filme-2tb" = {
+    device = "/dev/disk/by-uuid/24BF8D08326CF936";
+    fsType = "ntfs3";
+    options = [
+      "nofail"
+      "x-systemd.device-timeout=30s"
+      "uid=1000"
+      "gid=100"
+      "umask=0022"
+      "x-gvfs-show"
+      "x-gvfs-name=FOTO_FILME_2TB"
+    ];
+  };
+
+  fileSystems."/mnt/daten-1tb" = {
+    device = "/dev/disk/by-uuid/5B8E-31B2";
+    fsType = "vfat";
+    options = [
+      "nofail"
+      "x-systemd.device-timeout=30s"
+      "uid=1000"
+      "gid=100"
+      "umask=0022"
+      "iocharset=utf8"
+      "x-gvfs-show"
+      "x-gvfs-name=DATEN_1TB"
+    ];
+  };
+
+  fileSystems."/mnt/windows-ssd" = {
+    device = "/dev/disk/by-uuid/EA5878375878049B";
+    fsType = "ntfs3";
+    options = [
+      "nofail"
+      "x-systemd.device-timeout=30s"
+      "uid=1000"
+      "gid=100"
+      "umask=0022"
+      "x-gvfs-show"
+      "x-gvfs-name=WINDOWS_SSD"
+    ];
+  };
+
   networking.networkmanager.enable = true;
   time.timeZone = "Europe/Berlin";
 
@@ -30,6 +75,8 @@
   };
   console.keyMap = "de";
 
+  programs.zsh.enable = true;
+
   services.xserver = {
     enable = true;
     xkb.layout = "de";
@@ -46,11 +93,38 @@
   };
   security.rtkit.enable = true;
 
-  services.printing.enable = true;
+  services.printing = {
+    enable = true;
+    drivers = [ pkgs.hplip ];
+  };
+
+  hardware.printers = {
+    ensurePrinters = [
+      {
+        name = "HP_DeskJet_F4280";
+        location = "Home";
+        deviceUri = "usb://HP/Deskjet%20F4200%20series";
+        model = "drv:///hp/hpcups.drv/hp-deskjet_f4200_series.ppd";
+      }
+    ];
+    ensureDefaultPrinter = "HP_DeskJet_F4280";
+  };
+
+  hardware.sane = {
+    enable = true;
+    extraBackends = [ pkgs.hplip ];
+    drivers.scanSnap.enable = true;
+  };
+
   services.gvfs.enable = true;
   services.udisks2.enable = true;
   services.fwupd.enable = true;
   services.pcscd.enable = true;
+
+  # Grant pcscd access to the Identiv SPR532 USB smart-card reader.
+  services.udev.extraRules = ''
+    SUBSYSTEMS=="usb", ATTRS{idVendor}=="04e6", ATTRS{idProduct}=="e003", GROUP="pcscd", MODE="0660", TAG+="uaccess"
+  '';
 
   programs.firefox.enable = true;
   programs.dconf.enable = true;
@@ -64,6 +138,7 @@
   users.users.andreas = {
     isNormalUser = true;
     description = "Andreas";
+    shell = pkgs.zsh;
     extraGroups = [ "networkmanager" "wheel" "scanner" "lp" ];
   };
 
@@ -74,36 +149,48 @@
     thunderbird
     google-chrome
     vlc
+    rhythmbox
     flameshot
     masterpdfeditor4
     pdfarranger
     darktable
     simple-scan
     evince
+    kdePackages.okular
     dropbox
     nautilus
     qsync
     ausweisapp
     tk-safe
+    git
+    codex
+    libnotify # provides notify-send for the OCR script
+    ocrmypdf
+    tesseract
+    kitty
+    zsh
+    fzf
+    fd
+    bat
+    kdePackages.kdenlive
 
-    # Google Calendar has no native Linux client. This opens it in a dedicated
-    # Chrome window and gives it a normal application-menu entry.
+    # Open Google Calendar in a regular Chrome tab from the application menu.
     (makeDesktopItem {
       name = "google-calendar";
       desktopName = "Google Calendar";
       comment = "Open Google Calendar";
       icon = "x-office-calendar";
-      exec = "${google-chrome}/bin/google-chrome-stable --app=https://calendar.google.com/";
+      exec = "${google-chrome}/bin/google-chrome-stable https://calendar.google.com/";
       categories = [ "Office" "Calendar" ];
     })
 
-    # Gmail also has no native Linux client.
+    # Open Gmail in a regular Chrome tab from the application menu.
     (makeDesktopItem {
       name = "gmail";
       desktopName = "Gmail";
       comment = "Open Gmail";
       icon = "mail-message-new";
-      exec = "${google-chrome}/bin/google-chrome-stable --app=https://mail.google.com/";
+      exec = "${google-chrome}/bin/google-chrome-stable https://mail.google.com/";
       categories = [ "Network" "Email" ];
     })
   ];

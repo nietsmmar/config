@@ -61,6 +61,7 @@ alias copy="xclip -selection clipboard"
 alias paste="xsel --clipboard"
 
 alias nrb="sudo nixos-rebuild switch --flake ~/dev/config/nixos#laptop"
+alias nrbpc="sudo nixos-rebuild switch --flake ~/dev/config/nixos#andreas-pc"
 function ns() { 
     nix shell nixpkgs#$1
 }

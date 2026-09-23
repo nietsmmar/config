@@ -19,7 +19,7 @@ export PATH="$PATH:$HOME/dev/flutter/bin"
 export PATH="$PATH":"$HOME/.pub-cache/bin"
 ## [Completion]
 ## Completion scripts setup. Remove the following line to uninstall
-[[ -f /home/xunil/.config/.dart-cli-completion/zsh-config.zsh ]] && . /home/xunil/.config/.dart-cli-completion/zsh-config.zsh || true
+[[ -f "$HOME/.config/.dart-cli-completion/zsh-config.zsh" ]] && . "$HOME/.config/.dart-cli-completion/zsh-config.zsh" || true
 ## [/Completion]
 
-. "/home/xunil/.deno/env"
+[[ -f "$HOME/.deno/env" ]] && . "$HOME/.deno/env"
