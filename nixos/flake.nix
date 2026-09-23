@@ -10,6 +10,7 @@
       overlay = final: prev: {
         betterbird = prev.callPackage ./packages/betterbird/package.nix { };
         android-studio-flutter = prev.callPackage ./packages/android-studio-wrapper.nix { };
+        qsync = prev.callPackage ./packages/qsync.nix { };
         # Rename "SPR 532" -> "SPR532" in the ccid driver plist so that
         # tk-safe's epa-wrapper whitelist (which checks for "SPR532") matches.
         ccid = prev.ccid.overrideAttrs (old: {
@@ -42,6 +43,16 @@
             ./custom/laptop.nix
             ./hardware/laptop.nix
             { networking.hostName = "laptop"; }
+          ];
+        };
+        andreas-pc = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            { nixpkgs.overlays = [ overlay ]; }
+            ./custom/andreas-pc.nix
+            ./hardware/andreas-pc.nix
+            { networking.hostName = "andreas-pc"; }
           ];
         };
       };

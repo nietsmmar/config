@@ -4,6 +4,15 @@
   # This host intentionally does not import ../configuration.nix: that module
   # contains xunil's user, i3 setup, development tools and personal services.
 
+  # This computer boots in legacy BIOS mode. Install GRUB only on the dedicated
+  # NixOS SSD, addressed by its stable hardware ID so reconnecting the other
+  # disks cannot cause a future rebuild to overwrite the wrong drive.
+  boot.loader.grub = {
+    enable = true;
+    device = "/dev/disk/by-id/ata-FIKWOT_FX815_512GB_26030642612020488";
+    useOSProber = true;
+  };
+
   networking.networkmanager.enable = true;
   time.timeZone = "Europe/Berlin";
 

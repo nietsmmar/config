@@ -14,11 +14,6 @@
 {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
-  # These generic defaults make the flake evaluable before the machine exists.
-  # The generated hardware configuration must replace them before installation.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
   # Evaluation-only placeholder; nixos-generate-config will provide the real
   # device, filesystem type, swap and initrd modules during installation.
   fileSystems."/" = {
