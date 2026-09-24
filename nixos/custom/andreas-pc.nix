@@ -143,6 +143,8 @@
   };
 
   environment.systemPackages = with pkgs; [
+    # New packages are inserted below this line by scripts/add-andreas-software.sh.
+    # ANDREAS_SOFTWARE_MARKER
     signal-desktop
     telegram-desktop
     libreoffice
