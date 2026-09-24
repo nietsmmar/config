@@ -2,10 +2,12 @@
   description = "nixos flake";
 
   inputs = {
-    nixpkgs = { url = "github:NixOS/nixpkgs/nixos-unstable"; };
+    # Keep personal machines and Andreas's PC independently updatable.
+    nixpkgs-personal.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-andreas.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
-  outputs = inputs@{ self, nixpkgs, ... }:
+  outputs = inputs@{ self, nixpkgs-personal, nixpkgs-andreas, ... }:
     let
       overlay = final: prev: {
         betterbird = prev.callPackage ./packages/betterbird/package.nix { };
@@ -23,7 +25,7 @@
     in
     rec {
       nixosConfigurations = {
-        pc = nixpkgs.lib.nixosSystem {
+        pc = nixpkgs-personal.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs; };
           modules = [
@@ -34,7 +36,7 @@
             { networking.hostName = "pc"; }
           ];
         };
-        laptop = nixpkgs.lib.nixosSystem {
+        laptop = nixpkgs-personal.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs; };
           modules = [
@@ -45,7 +47,7 @@
             { networking.hostName = "laptop"; }
           ];
         };
-        andreas-pc = nixpkgs.lib.nixosSystem {
+        andreas-pc = nixpkgs-andreas.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs; };
           modules = [
@@ -60,7 +62,7 @@
       # Development shells
       devShells.x86_64-linux =
         let
-          pkgs = import nixpkgs {
+          pkgs = import nixpkgs-personal {
             system = "x86_64-linux";
             config.allowUnfree = true;
           };

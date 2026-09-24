@@ -62,6 +62,10 @@ alias paste="xsel --clipboard"
 
 alias nrb="sudo nixos-rebuild switch --flake ~/dev/config/nixos#laptop"
 alias nrbpc="sudo nixos-rebuild switch --flake ~/dev/config/nixos#andreas-pc"
+alias update-nix="nix flake update --flake ~/dev/config/nixos nixpkgs-personal"
+alias update-nix-andreas="nix flake update --flake ~/dev/config/nixos nixpkgs-andreas"
+alias add="$CONFIG/scripts/add-andreas-software.sh"
+alias remove="$CONFIG/scripts/remove-andreas-software.sh"
 function ns() { 
     nix shell nixpkgs#$1
 }
