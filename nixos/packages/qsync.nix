@@ -119,6 +119,7 @@ buildFHSEnv {
   targetPkgs = _pkgs: [ qsync-unwrapped ];
   extraBuildCommands = ''
     mkdir -p "$out/usr/local" "$out/var/lib/dbus"
+    touch "$out/var/lib/dbus/machine-id"
   '';
   extraBwrapArgs = [
     "--ro-bind ${qsync-unwrapped}/usr/local /usr/local"
