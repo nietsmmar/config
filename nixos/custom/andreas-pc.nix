@@ -197,6 +197,11 @@
     })
   ];
 
+  # Start Qsync when Andreas logs into Cinnamon. The internal data drives are
+  # mounted during boot, before the graphical login session starts.
+  environment.etc."xdg/autostart/QNAPQsyncClient.desktop".source =
+    "${pkgs.qsync}/share/applications/QNAPQsyncClient.desktop";
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.gc = {
     automatic = true;
