@@ -112,7 +112,7 @@ let
   });
 in
 buildFHSEnv {
-  name = "qsync-${qsync-unwrapped.version}";
+  name = "qsync";
 
   # The proprietary binary launches helpers through hard-coded /usr/local
   # paths. Keep QNAP's original Ubuntu layout inside a small FHS environment.
