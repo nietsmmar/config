@@ -35,13 +35,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "qsync";
-  # 1.0.12.2202 hangs at full CPU while creating folder pairs on Linux.
-  # Keep the preceding release until QNAP publishes a fixed Linux client.
-  version = "1.0.11.0509";
+  version = "1.0.12.2202";
 
   src = fetchurl {
     url = "https://download.qnap.com/Storage/Utility/QNAPQsyncClientUbuntux64-${finalAttrs.version}.deb";
-    hash = "sha256-o9YqruA1Vrp6YtJDBfQXbZYtZxhBrTGIe8+anEWrkFI=";
+    hash = "sha256-B7hbS8e/E28qUzRZWhhkRTzbdd5TwMpCWmWaAkeOAvg=";
   };
 
   nativeBuildInputs = [
