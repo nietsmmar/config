@@ -118,10 +118,13 @@ buildFHSEnv {
   # paths. Keep QNAP's original Ubuntu layout inside a small FHS environment.
   targetPkgs = _pkgs: [ qsync-unwrapped ];
   extraBuildCommands = ''
-    mkdir -p "$out/usr/local"
+    mkdir -p "$out/usr/local" "$out/var/lib/dbus"
   '';
   extraBwrapArgs = [
     "--ro-bind ${qsync-unwrapped}/usr/local /usr/local"
+    # Qsync's bundled Qt checks this legacy Ubuntu path when generating the
+    # encryption key used to store the NAS password.
+    "--ro-bind /etc/machine-id /var/lib/dbus/machine-id"
   ];
   runScript = "/usr/local/bin/QNAP/QsyncClient/Qsync.sh";
 
