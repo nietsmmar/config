@@ -117,6 +117,9 @@ buildFHSEnv {
   # The proprietary binary launches helpers through hard-coded /usr/local
   # paths. Keep QNAP's original Ubuntu layout inside a small FHS environment.
   targetPkgs = _pkgs: [ qsync-unwrapped ];
+  extraBuildCommands = ''
+    mkdir -p "$out/usr/local"
+  '';
   extraBwrapArgs = [
     "--ro-bind ${qsync-unwrapped}/usr/local /usr/local"
   ];
