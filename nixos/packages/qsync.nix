@@ -112,6 +112,7 @@ stdenv.mkDerivation (finalAttrs: {
       --replace-warn /usr/local/lib/QNAP/QsyncClient "$out/lib/qsync"
 
     makeWrapper "$out/lib/qsync/Qsync" "$out/bin/qsync" \
+      --run 'ulimit -n 4096' \
       --set QT_PLUGIN_PATH "$out/lib/qsync" \
       --set QT_QPA_PLATFORM_PLUGIN_PATH "$out/lib/qsync/platforms" \
       --prefix LD_LIBRARY_PATH : "$out/lib/qsync"
