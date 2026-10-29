@@ -100,6 +100,10 @@ exec --no-startup-id picom --config ~/.i3/picom_config
 exec xautolock -time 15 -locker lockScreen &
 exec --no-startup-id $HOME/dev/config/scripts/prevent_display_sleep_on_audio.sh &
 
+# Keep left + right click independent (needed for medium grenade throws in CS2).
+exec_always --no-startup-id xinput set-prop "Logitech Gaming Mouse G402" "libinput Middle Emulation Enabled" 0
+exec_always --no-startup-id xinput set-prop "Kingsis Peripherals Evoluent VerticalMouse C" "libinput Middle Emulation Enabled" 0
+
 # fix mouse sensitivity
 exec xinput --set-prop 15 329 -0.3
 
