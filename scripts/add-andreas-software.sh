@@ -75,4 +75,8 @@ printf ' %s' "${packages[@]}"
 printf '\nRebuilding andreas-pc...\n'
 
 # This is the command behind the interactive `nrbpc` alias.
-sudo nixos-rebuild switch --flake "$config_dir/nixos#andreas-pc"
+if [[ "${ANDREAS_SOFTWARE_GUI:-}" == "1" ]] && command -v pkexec >/dev/null; then
+  pkexec nixos-rebuild switch --flake "$config_dir/nixos#andreas-pc"
+else
+  sudo nixos-rebuild switch --flake "$config_dir/nixos#andreas-pc"
+fi

@@ -13,6 +13,7 @@
         betterbird = prev.callPackage ./packages/betterbird/package.nix { };
         android-studio-flutter = prev.callPackage ./packages/android-studio-wrapper.nix { };
         qsync = prev.callPackage ./packages/qsync.nix { };
+        programme-verwalten = prev.callPackage ./packages/andreas-software-manager.nix { };
         # Rename "SPR 532" -> "SPR532" in the ccid driver plist so that
         # tk-safe's epa-wrapper whitelist (which checks for "SPR532") matches.
         ccid = prev.ccid.overrideAttrs (old: {
@@ -22,8 +23,9 @@
           '';
         });
       };
+
     in
-    rec {
+    {
       nixosConfigurations = {
         pc = nixpkgs-personal.lib.nixosSystem {
           system = "x86_64-linux";
@@ -43,6 +45,7 @@
             { nixpkgs.overlays = [ overlay ]; }
             ./configuration.nix
             ./custom/laptop.nix
+            ./custom/feed-me-kiosk.nix
             ./hardware/laptop.nix
             { networking.hostName = "laptop"; }
           ];

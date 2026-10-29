@@ -1,6 +1,7 @@
 {
-    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.colorTheme": "Dark Modern",
     "nix.enableLanguageServer": true,
     "git.openRepositoryInParentFolders": "never",
-    "window.zoomLevel": 2
+    "window.zoomLevel": 2,
+    "chat.viewSessions.orientation": "stacked"
 }

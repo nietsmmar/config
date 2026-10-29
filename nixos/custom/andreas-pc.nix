@@ -175,6 +175,16 @@
     fd
     bat
     kdePackages.kdenlive
+    programme-verwalten
+
+    (makeDesktopItem {
+      name = "programme-verwalten";
+      desktopName = "Programme verwalten";
+      comment = "Programme für diesen Computer installieren oder entfernen";
+      icon = "system-software-install";
+      exec = "${programme-verwalten}/bin/programme-verwalten";
+      categories = [ "System" "Settings" ];
+    })
 
     # Open Google Calendar in a regular Chrome tab from the application menu.
     (makeDesktopItem {

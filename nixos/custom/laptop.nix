@@ -1,6 +1,12 @@
 { config, pkgs, lib, ... }:
 
 {
+  # NetworkManager's shared-mode hotspot serves DHCP and DNS on this interface.
+  networking.firewall.interfaces.wlp0s20f3 = {
+    allowedTCPPorts = [ 53 ];
+    allowedUDPPorts = [ 53 67 ];
+  };
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

@@ -157,8 +157,30 @@
 
 
   # printing
-  services.printing.enable = true;
+  services.printing = {
+    enable = true;
+    # Use HP's model-specific raster driver.  The ENVY 4520's driverless
+    # AirPrint path produces horizontal banding, while the printer's own test
+    # page is clean.
+    drivers = [ pkgs.hplip ];
+    # This printer has a permanent, declarative IPP queue below.  Do not also
+    # create an implicit cups-browsed queue, which adds another filter/forwarding
+    # layer and can produce different output from the direct queue.
+    browsed.enable = false;
+  };
   services.ipp-usb.enable = true;
+
+  # The printer is addressed via mDNS (.local).  At boot ensure-printers can
+  # otherwise run before NetworkManager/Avahi can resolve it, fail once, and
+  # leave no direct queue.  Wait for discovery and retry transient failures.
+  systemd.services.ensure-printers = {
+    wants = [ "network-online.target" "avahi-daemon.service" ];
+    after = [ "network-online.target" "avahi-daemon.service" ];
+    serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = "5s";
+    };
+  };
 
   hardware.printers = {
     ensurePrinters = [
@@ -166,7 +188,7 @@
         name = "HP_ENVY_4520";
         location = "Home";
         deviceUri = "ipp://HP705A0F6C29F1.local:631/ipp/print";
-        model = "everywhere";
+        model = "drv:///hp/hpcups.drv/hp-envy_4520_series.ppd";
       }
     ];
     ensureDefaultPrinter = "HP_ENVY_4520";
@@ -258,6 +280,7 @@
   virtualisation.docker.enable = true;
 
   environment.systemPackages = with pkgs; [
+      (callPackage ./packages/gsm-hotspot.nix {})
       # `internet-limit {status|pause [DUR]|resume}` — see scripts/internet-limit/
       (writeShellScriptBin "internet-limit" ''
         exec /home/xunil/dev/config/scripts/internet-limit/internet-limit.sh "$@"
@@ -354,6 +377,114 @@
       gedit
       gamemode
   ];
+
+  services.immich = {
+    enable = true;
+    port = 2283;
+
+    # Keep Immich's own UI-integrated database dumps enabled. These are useful
+    # for quick restores from the Administration -> Maintenance page.
+    # Configuring this here makes the Immich settings read-only in the UI.
+    settings.backup.database = {
+      enabled = true;
+      cronExpression = "0 02 * * *";
+      keepLastAmount = 14;
+    };
+  };
+
+  # Immich's cron scheduler misses a run while the PC is powered off. Create a
+  # second, UI-compatible PostgreSQL dump on the T7 with a persistent systemd
+  # timer: when 02:30 was missed, systemd runs it after the next boot instead.
+  systemd.services.immich-database-backup-t7 = {
+    description = "Back up the Immich database to the T7";
+    requires = [ "postgresql.service" ];
+    after = [ "postgresql.service" ];
+    unitConfig.RequiresMountsFor = [ "/mnt/t7" ];
+    path = [
+      config.services.postgresql.package
+      pkgs.coreutils
+      pkgs.findutils
+      pkgs.gzip
+    ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      User = "immich";
+      Group = "immich";
+      UMask = "0077";
+      NoNewPrivileges = true;
+      PrivateTmp = true;
+      ProtectHome = true;
+      ProtectSystem = "strict";
+      ReadWritePaths = [ "/mnt/t7" ];
+    };
+
+    script = ''
+      set -euo pipefail
+
+      backup_directory=/mnt/t7/immich-backups/database
+      backup_timestamp="$(date +%Y%m%dT%H%M%S)"
+      database_version="$(psql --host=/run/postgresql --username=immich --dbname=immich --tuples-only --no-align --command='SHOW server_version' | cut --delimiter=' ' --fields=1)"
+      backup_file="$backup_directory/immich-db-backup-$backup_timestamp-v${config.services.immich.package.version}-pg$database_version.sql.gz"
+      temporary_file="$backup_file.tmp"
+
+      mkdir -p "$backup_directory"
+      trap 'rm -f "$temporary_file"' EXIT
+
+      pg_dump \
+        --host=/run/postgresql \
+        --username=immich \
+        --dbname=immich \
+        --clean \
+        --if-exists \
+        | gzip --rsyncable > "$temporary_file"
+
+      gzip --test "$temporary_file"
+      mv "$temporary_file" "$backup_file"
+      trap - EXIT
+
+      # Match the retention configured for Immich's built-in dumps.
+      find "$backup_directory" \
+        -maxdepth 1 \
+        -type f \
+        -name 'immich-db-backup-*.sql.gz' \
+        -printf '%T@ %p\n' \
+        | sort --numeric-sort --reverse \
+        | tail --lines=+15 \
+        | cut --delimiter=' ' --fields=2- \
+        | while IFS= read -r old_backup; do
+            rm -f -- "$old_backup"
+          done
+    '';
+  };
+
+  systemd.timers.immich-database-backup-t7 = {
+    description = "Daily Immich database backup to the T7";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "*-*-* 02:30:00";
+      Persistent = true;
+    };
+  };
+
+  # Allow Immich to persist metadata edits as XMP sidecars in the external
+  # library. This also allows Immich to delete assets when trash is emptied.
+  users.users.immich.extraGroups = [ "users" ];
+
+  # Mount the existing photo collection at a stable path for use as an
+  # Immich external library. xunil and members of `users` can write.
+  fileSystems."/mnt/t7" = {
+    device = "/dev/disk/by-uuid/7A1F-5428";
+    fsType = "exfat";
+    options = [
+      "nofail"
+      "x-systemd.automount"
+      "uid=1000"
+      "gid=100"
+      "fmask=0113"
+      "dmask=0002"
+    ];
+  };
 
   # qt
   qt.enable = true;
