@@ -99,7 +99,7 @@
 
   # Don't suspend when the lid is closed while docked or driving external
   # displays (this is already the systemd default; set explicitly for clarity).
-  services.logind.lidSwitchDocked = "ignore";
+  services.logind.settings.Login.HandleLidSwitchDocked = "ignore";
 
   # Cleanly hibernate before the battery dies (session survives to disk and
   # resumes on next power-on). Hibernate/resume is already working on this
@@ -150,10 +150,10 @@
     # steam module's extraLibraries → package32/extraPackages32 path). Each entry
     # maps to one of the missing sonames.
     extraPackages32 = with pkgs.pkgsi686Linux; [
-      xorg.libXtst      # libXtst.so.6
-      xorg.libXrandr    # libXrandr.so.2
-      xorg.libXrender   # libXrender.so.1
-      xorg.libXi        # libXi.so.6
+      libxtst           # libXtst.so.6
+      libxrandr         # libXrandr.so.2
+      libxrender        # libXrender.so.1
+      libxi             # libXi.so.6
       gtk2              # libgtk-x11-2.0.so.0
       pipewire          # libpipewire-0.3.so.0
       libpulseaudio     # libpulse.so.0

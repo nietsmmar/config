@@ -12,10 +12,10 @@ pkgs.mkShell {
     pkg-config
     gtk3
     webkitgtk_4_1
-    xorg.libX11
+    libx11
     util-linux.dev
-    xorg.libXdmcp
-    xorg.libXtst
+    libxdmcp
+    libxtst
     sysprof
     libepoxy
     fontconfig

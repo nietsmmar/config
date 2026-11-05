@@ -52,7 +52,7 @@
     displayManager = {
         sessionCommands =
           ''
-          ${pkgs.xorg.xmodmap}/bin/xmodmap $HOME/dev/config/xmodmap/xmodmap
+          ${pkgs.xmodmap}/bin/xmodmap $HOME/dev/config/xmodmap/xmodmap
           '';
     };
 
@@ -170,18 +170,6 @@
   };
   services.ipp-usb.enable = true;
 
-  # The printer is addressed via mDNS (.local).  At boot ensure-printers can
-  # otherwise run before NetworkManager/Avahi can resolve it, fail once, and
-  # leave no direct queue.  Wait for discovery and retry transient failures.
-  systemd.services.ensure-printers = {
-    wants = [ "network-online.target" "avahi-daemon.service" ];
-    after = [ "network-online.target" "avahi-daemon.service" ];
-    serviceConfig = {
-      Restart = "on-failure";
-      RestartSec = "5s";
-    };
-  };
-
   hardware.printers = {
     ensurePrinters = [
       {
@@ -253,6 +241,7 @@
   xdg.portal = {
     enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    config.common.default = "gtk";
   };
 
   # fix gstreamer audio/video properties in nautilus
@@ -272,8 +261,13 @@
   # PC/SC smart card daemon — required for eGK card reader (Identiv SPR332 v2)
   services.pcscd.enable = true;
 
-  # udev rule for Identiv SPR532 (04e6:e003) — grants pcscd access to the reader
+  # udev rules for hot-plugged devices.
   services.udev.extraRules = ''
+    # Mount the replacement T7 Shield at its stable path as soon as its
+    # partition appears.
+    ACTION=="add", SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", ENV{ID_SERIAL_SHORT}=="S6YGNJ0W500395D", TAG+="systemd", ENV{SYSTEMD_WANTS}+="mnt-t7.mount"
+
+    # Identiv SPR532 (04e6:e003) — grant pcscd access to the reader.
     SUBSYSTEMS=="usb", ATTRS{idVendor}=="04e6", ATTRS{idProduct}=="e003", GROUP="pcscd", MODE="0660", TAG+="uaccess"
   '';
 
@@ -299,14 +293,14 @@
       keepassxc
       wget
       lxappearance
-      xorg.xmodmap
+      xmodmap
       libsForQt5.qt5ct
       adwaita-icon-theme
       adwaita-qt
       adwaita-qt6
       alsa-utils
       alsa-tools
-      xorg.xprop
+      xprop
       zip
       dconf
       libimobiledevice
@@ -362,7 +356,6 @@
       gnutar
       libreoffice
       filezilla
-      gemini-cli
       xautolock
       redshift
       nodejs_24 # for npx supabase mcp
@@ -381,19 +374,16 @@
   services.immich = {
     enable = true;
     port = 2283;
-
-    # Keep Immich's own UI-integrated database dumps enabled. These are useful
-    # for quick restores from the Administration -> Maintenance page.
-    # Configuring this here makes the Immich settings read-only in the UI.
-    settings.backup.database = {
-      enabled = true;
-      cronExpression = "0 02 * * *";
-      keepLastAmount = 14;
-    };
+    mediaLocation = "/mnt/t7/immich-data";
   };
 
-  # Immich's cron scheduler misses a run while the PC is powered off. Create a
-  # second, UI-compatible PostgreSQL dump on the T7 with a persistent systemd
+  # Do not start Immich without its media storage mounted.
+  systemd.services.immich-server.unitConfig.RequiresMountsFor = [
+    "/mnt/t7/immich-data"
+  ];
+
+  # Immich's cron scheduler misses a run while the PC is powered off. Create an
+  # UI-compatible PostgreSQL dump on the T7 with a persistent systemd
   # timer: when 02:30 was missed, systemd runs it after the next boot instead.
   systemd.services.immich-database-backup-t7 = {
     description = "Back up the Immich database to the T7";
@@ -443,7 +433,7 @@
       mv "$temporary_file" "$backup_file"
       trap - EXIT
 
-      # Match the retention configured for Immich's built-in dumps.
+      # Keep the most recent 14 database dumps.
       find "$backup_directory" \
         -maxdepth 1 \
         -type f \
@@ -474,15 +464,11 @@
   # Mount the existing photo collection at a stable path for use as an
   # Immich external library. xunil and members of `users` can write.
   fileSystems."/mnt/t7" = {
-    device = "/dev/disk/by-uuid/7A1F-5428";
-    fsType = "exfat";
+    device = "/dev/disk/by-id/usb-Samsung_PSSD_T7_Shield_S6YGNJ0W500395D-0:0-part1";
+    fsType = "ext4";
     options = [
       "nofail"
       "x-systemd.automount"
-      "uid=1000"
-      "gid=100"
-      "fmask=0113"
-      "dmask=0002"
     ];
   };
 
