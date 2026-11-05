@@ -41,3 +41,7 @@ make_symlink claude/.claude.json .claude.json
 make_symlink xdg/user-dirs.dirs .config/user-dirs.dirs
 make_symlink xdg/user-dirs.conf .config/user-dirs.conf
 make_symlink flameshot/flameshot.ini .config/flameshot/flameshot.ini
+
+# Do not symlink .config/syncthing into this repository. It contains the
+# machine-specific private device key, certificates, GUI API key, and mutable
+# state. Safe shared Syncthing settings are declared in nixos/configuration.nix.

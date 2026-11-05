@@ -66,11 +66,9 @@
     };
   };
 
-  # Secret Service (keyring) so apps like the Nextcloud client can persist
-  # their login token across reboots. Bare i3 starts no keyring daemon on its
-  # own, so without this the client has nowhere to store credentials and prompts
-  # for login on every boot. PAM unlocks the keyring with the login password at
-  # the LightDM greeter, so it's transparent (no separate keyring prompt).
+  # Secret Service (keyring) for desktop applications. Bare i3 starts no
+  # keyring daemon on its own; PAM unlocks it with the login password at the
+  # LightDM greeter, so there is no separate keyring prompt.
   services.gnome.gnome-keyring.enable = true;
   security.pam.services.lightdm.enableGnomeKeyring = true;
 
@@ -228,6 +226,33 @@
   # module for udiskie (that option only exists in home-manager).
   services.udisks2.enable = true;
 
+  # Keep personal files in sync between the laptop, desktop, and phone. Device
+  # identities and folder sharing are configured in Syncthing's local web UI;
+  # keeping overrideDevices/overrideFolders disabled preserves those UI changes.
+  services.syncthing = {
+    enable = true;
+    user = "xunil";
+    group = "users";
+    dataDir = "/home/xunil";
+    # Keep this machine-specific state out of the Git/symlink configuration.
+    # It contains Syncthing's private device identity and GUI API key.
+    configDir = "/home/xunil/.config/syncthing";
+    openDefaultPorts = true;
+    overrideDevices = false;
+    overrideFolders = false;
+
+    settings.folders = {
+      notes = {
+        label = "Obsidian notes";
+        path = "/home/xunil/docs/notes";
+      };
+      keepass = {
+        label = "KeePass";
+        path = "/home/xunil/keepass";
+      };
+    };
+  };
+
   # NTFS read/write support so udisks/Nautilus can mount NTFS drives (via
   # ntfs-3g). ntfs3g in systemPackages also provides the `ntfsfix` CLI for
   # clearing the "dirty" flag left by unclean Windows ejects/hibernation.
@@ -328,7 +353,6 @@
       bat
       google-chrome
       keepassxc
-      nextcloud-client
       slack
       flameshot
       pavucontrol
