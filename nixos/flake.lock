@@ -1,5 +1,17 @@
 {
   "nodes": {
+    "lakers-radar": {
+      "locked": {
+        "lastModified": 1794233853,
+        "narHash": "sha256-EOX28QgtDty1rEo5q1Nt+dhy2pDTbfovtQeXHZJj8ic=",
+        "path": "/home/xunil/dev/lakers_radar",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/xunil/dev/lakers_radar",
+        "type": "path"
+      }
+    },
     "nixpkgs-andreas": {
       "locked": {
         "lastModified": 1788179007,
@@ -34,6 +46,7 @@
     },
     "root": {
       "inputs": {
+        "lakers-radar": "lakers-radar",
         "nixpkgs-andreas": "nixpkgs-andreas",
         "nixpkgs-personal": "nixpkgs-personal"
       }

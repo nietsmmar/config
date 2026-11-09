@@ -5,6 +5,9 @@
     # Keep personal machines and Andreas's PC independently updatable.
     nixpkgs-personal.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-andreas.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Laptop-local project; an absolute path avoids flake purity resolving the
+    # relative path inside the config repository's copied Nix store source.
+    lakers-radar.url = "path:/home/xunil/dev/lakers_radar";
   };
 
   outputs = inputs@{ self, nixpkgs-personal, nixpkgs-andreas, ... }:
@@ -46,6 +49,7 @@
             ./configuration.nix
             ./custom/laptop.nix
             ./custom/feed-me-kiosk.nix
+            inputs.lakers-radar.nixosModules.default
             ./hardware/laptop.nix
             { networking.hostName = "laptop"; }
           ];
