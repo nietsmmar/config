@@ -1,6 +1,8 @@
 { config, pkgs, lib, ... }:
 
 {
+  imports = [ ../services/ausschreibung-monitor.nix ];
+
   # NetworkManager's shared-mode hotspot serves DHCP and DNS on this interface.
   networking.firewall.interfaces.wlp0s20f3 = {
     allowedTCPPorts = [ 53 ];
